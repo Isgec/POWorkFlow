@@ -72,7 +72,7 @@ namespace PreOrderWorkflow
                         if (dt.Rows.Count > 0)
                         {
                           
-                            //string sDocumentId = dt.Rows[0]["t_dcid"].ToString();
+                            string sDocumentId = dt.Rows[0]["t_dcid"].ToString();
                             string sFileName = dt.Rows[0]["t_fnam"].ToString();
                             string sLibCode = dt.Rows[0]["t_lbcd"].ToString();
                             string sattachedby = dt.Rows[0]["t_atby"].ToString();
@@ -82,7 +82,7 @@ namespace PreOrderWorkflow
 
                             //string sCount = @"select MAX(CONVERT(int,t_drid)) from ttcisg132200";
                             nRecord = new Random(Guid.NewGuid().GetHashCode()).Next();
-                            string sDocumentId = "AAA" + nRecord;
+                            //string sDocumentId = "AAA" + nRecord;
                            // string sCount = @"SELECT (ISNULL(MAX(t_rnum),0) + 1)as RunningNo FROM ttcisg131200 where t_acti='Y'";
                             //string count =(Microsoft.ApplicationBlocks.Data.SqlHelper.ExecuteScalar(conLive, CommandType.Text, sCount)).ToString();
                             //nRecord = Convert.ToInt32(count);
