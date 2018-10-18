@@ -143,6 +143,7 @@
     <Content Include="scripts\jquery.js" />
     <Content Include="scripts\ScrollableGridPlugin.js" />
     <Content Include="TechnicalClearance.aspx" />
+    <Content Include="TechnoCommercialNegotiaition.aspx" />
     <Content Include="ViewIDMSReceipt.aspx" />
     <Content Include="ViewWorkflow.aspx" />
     <Content Include="Web.config">
@@ -272,6 +273,13 @@
     </Compile>
     <Compile Include="TechnicalClearance.aspx.designer.cs">
       <DependentUpon>TechnicalClearance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TechnoCommercialNegotiaition.aspx.cs">
+      <DependentUpon>TechnoCommercialNegotiaition.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TechnoCommercialNegotiaition.aspx.designer.cs">
+      <DependentUpon>TechnoCommercialNegotiaition.aspx</DependentUpon>
     </Compile>
     <Compile Include="ViewIDMSReceipt.aspx.cs">
       <DependentUpon>ViewIDMSReceipt.aspx</DependentUpon>

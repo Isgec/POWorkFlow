@@ -375,11 +375,11 @@ namespace PreOrderWorkflow
             SqlHelper.ExecuteNonQuery(Con, CommandType.Text, sInsertPMDL);
         }
         //InsertMultiPMDLtoDuplicateTable
-        //public void InsertMultiPMDLtoDuplicateTable()
-        //{
-        //    string sInsertMultiPMDLtoDuplicateTable = @" Insert into tdmisg167200 values('" + WFID + "','" + MultiPMDLdocDesc + "',0,0)";
-        //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sInsertMultiPMDLtoDuplicateTable);
-        //}
+        public void InsertMultiPMDLtoDuplicateTable()
+        {
+            string sInsertMultiPMDLtoDuplicateTable = @" Insert into tdmisg167200 values('" + WFID + "','" + MultiPMDLdocDesc + "',0,0)";
+            SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sInsertMultiPMDLtoDuplicateTable);
+        }
         public DataTable InserPreOrderHistory()
         {
             List<SqlParameter> sqlParamater = new List<SqlParameter>();
@@ -696,10 +696,10 @@ namespace PreOrderWorkflow
             string sInsertToControlTowerChildTable = @" Insert into ttpisg230200(t_trdt,t_bohd,t_indv,t_srno,t_dsno,t_stat,t_proj,
                                                         t_elem,t_dwno,t_pitc,t_wght,t_atcd,t_scup,t_acdt,t_acfh,
                                                        t_pper,t_lupd,t_Refcntd,t_Refcntu,t_numo,t_numq,t_numt,
-                                                        t_numv,t_nutc)
+                                                        t_numv,t_nutc,t_cuni,t_iref,t_quan,t_iuom)
                                            values( '" + TransactionDate + "', '" + BusinessObjectHandle + "','" + IndexValue + "','" + SLNO_WFID + @"',
                                             '" + DetailSerialCount + "','','" + Project + "','" + Element + "', '" + PMDLdocDesc + "','" + PartItemCount + @"',
-                                            '" + PartItemWeight + "','','','','','','',0,0,0,0,0,0,0)";
+                                            '" + PartItemWeight + "','','','','','','',0,0,0,0,0,0,0,0,0,0,0)";
              SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sInsertToControlTowerChildTable);
 
         }
@@ -708,7 +708,7 @@ namespace PreOrderWorkflow
 
         public DataTable GetPartItemCount_Weight()
         {
-            string sPartItemCount_Weight = @" Select count(t_item) as PartItemCount, sum(t_wght) as PartItenWeight from tdmisg002200 where t_docn in ( '" + PMDLdocDesc + "')";
+            string sPartItemCount_Weight = @" Select count(t_item) as PartItemCount, sum(t_wght) as PartItenWeight from tdmisg002200 where t_docn = '" + PMDLdocDesc + "'";
             return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sPartItemCount_Weight).Tables[0];
         }
 
@@ -891,13 +891,9 @@ namespace PreOrderWorkflow
             sqlParamater.Add(new SqlParameter("@ReceiptNo", sReceiptNo));
             return SqlHelper.ExecuteDataset(Con129, CommandType.StoredProcedure, "IDMSReceiptDetails_DocumentTracking", sqlParamater.ToArray()).Tables[0];
         }
-        
         public string GetReceiptStatus(string sReceiptNo)
         {
-            string sReceiptStatus = "";
-            try
-            {
-                 sReceiptStatus = @"Select case 
+            string sReceiptStatus = @"Select case 
                                         when t_stat='1' then 'Submitted'
                                         when t_stat='2' then'Document linking'
                                         when t_stat='3' then 'Under Evaluation'
@@ -906,22 +902,9 @@ namespace PreOrderWorkflow
                                         when t_stat='6' then'Transmittal Issued'
                                         when t_stat='7' then 'Superseded'
                                         when t_stat='8' then'Closed'
-                                        else ''
                                         end as [Doc_Status]
                                         from tdmisg134200 where t_rcno ='" + sReceiptNo + "'";
-
-                var outputParam= SqlHelper.ExecuteScalar(Con129, CommandType.Text, sReceiptStatus).ToString();
-                if (!Convert.IsDBNull(outputParam))
-                return (outputParam).ToString();
-               else return "";
-            }
-            catch (Exception ex)
-            {
-                string sErrorMessage = ex.Message;
-                string sStackTrace = ex.StackTrace;
-                string sErrorQuery=sReceiptStatus;
-                return "";
-            }
+            return SqlHelper.ExecuteScalar(Con129, CommandType.Text, sReceiptStatus).ToString();
         }
         //public DataTable GetReceiptDetails(string sReceiptNo)   IDMSReceiptDetails_DocumentTracking
         //{
@@ -949,243 +932,243 @@ namespace PreOrderWorkflow
 
 
 
-        //public DataTable GetRaisedEnquiryDate( )
-        //{
-        //    string sRaisedEnquiryDate = @"select Convert(varchar(20), t_rfqd,105) as RaisedDate,t_iref from tdmisg140200 where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
-        //    return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sRaisedEnquiryDate).Tables[0];
-        //}
-        ////GetTechOfferReceiveDate
-        //public DataTable GetTechOfferReceiveDate()
-        //{
-        //    string sTechOfferReceiveDate = @"select Convert(varchar(20), t_ofdt,105) as OfferReceiveDate,t_iref from tdmisg140200 where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
-        //    return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sTechOfferReceiveDate).Tables[0];
-        //}
-        ////GetTechnoCommercialDate- Do not have to select technocommercial date only Itemref
-        //public DataTable GetTechnoCommercialItemReference()
-        //{
-        //    string sTechOfferReceiveDate = @"select Convert(varchar(20), t_cmfd,105) as TechnoCommercialDate, t_iref from tdmisg140200 where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
-        //    return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sTechOfferReceiveDate).Tables[0];
-        //}
-        //public void UpdateRaisedEnquiryDate(string CurrentDate)
-        //{
-        //    string sUpdateRaiseEnquiryDate = @"update tdmisg140200 set t_rfqd= '"+ CurrentDate + "'  where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
+        public DataTable GetRaisedEnquiryDate( )
+        {
+            string sRaisedEnquiryDate = @"select Convert(varchar(20), t_rfqd,105) as RaisedDate,t_iref from tdmisg140200 where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
+            return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sRaisedEnquiryDate).Tables[0];
+        }
+        //GetTechOfferReceiveDate
+        public DataTable GetTechOfferReceiveDate()
+        {
+            string sTechOfferReceiveDate = @"select Convert(varchar(20), t_ofdt,105) as OfferReceiveDate,t_iref from tdmisg140200 where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
+            return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sTechOfferReceiveDate).Tables[0];
+        }
+        //GetTechnoCommercialDate- Do not have to select technocommercial date only Itemref
+        public DataTable GetTechnoCommercialItemReference()
+        {
+            string sTechOfferReceiveDate = @"select Convert(varchar(20), t_cmfd,105) as TechnoCommercialDate, t_iref from tdmisg140200 where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
+            return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sTechOfferReceiveDate).Tables[0];
+        }
+        public void UpdateRaisedEnquiryDate(string CurrentDate)
+        {
+            string sUpdateRaiseEnquiryDate = @"update tdmisg140200 set t_rfqd= '"+ CurrentDate + "'  where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
 
-        //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateRaiseEnquiryDate);
-        //}
-        ////UpdateOfferReceiveDate
-        //public void UpdateOfferReceiveDate(string CurrentDate)
+            SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateRaiseEnquiryDate);
+        }
+        //UpdateOfferReceiveDate
+        public void UpdateOfferReceiveDate(string CurrentDate)
+        {
+            string sUpdateOfferReceiveDate = @"update tdmisg140200 set t_ofdt= '" + CurrentDate + "'  where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
+
+            SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateOfferReceiveDate);
+        }
+
+        //UpdateTechnoCommercialDate
+        public void UpdateTechnoCommercialNegotiationDate(string CurrentDate)
+        {
+            string sUpdateTechnoCommercialNegotiationDate = @"update tdmisg140200 set t_cmfd= '" + CurrentDate + "'  where t_docn='" + PMDLdocDesc + "'";
+
+            SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateTechnoCommercialNegotiationDate);
+        }
+        //UpdateTechnoCommercialDate- Do not have to update TechnoCommercial Date
+        //public void UpdateTechnoCommercialDate(string CurrentDate)
         //{
-        //    string sUpdateOfferReceiveDate = @"update tdmisg140200 set t_ofdt= '" + CurrentDate + "'  where t_docn='" + PMDLdocDesc + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
+        //    string sUpdateOfferReceiveDate = @"update tdmisg140200 set t_ofdt= '" + CurrentDate + "'  where t_docn='" + PMDLdocDesc + "'";
 
         //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateOfferReceiveDate);
         //}
 
-        ////UpdateTechnoCommercialDate
-        //public void UpdateTechnoCommercialNegotiationDate(string CurrentDate)
-        //{
-        //    string sUpdateTechnoCommercialNegotiationDate = @"update tdmisg140200 set t_cmfd= '" + CurrentDate + "'  where t_docn='" + PMDLdocDesc + "'";
+        public string GetItemRefType()
+        {
+            string sGetItemRefType = @"select t_icls from ttpisg239200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' ";
+            var outputParam= SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetItemRefType);
+            if (!(outputParam ==null))
+                return (outputParam).ToString();
+            else return "";
+        }
+        public double GeTotalDrawingCount()
+        {
+            string sTotalDrawing = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference+ "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sTotalDrawing));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
 
-        //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateTechnoCommercialNegotiationDate);
-        //}
-        ////UpdateTechnoCommercialDate- Do not have to update TechnoCommercial Date
-        ////public void UpdateTechnoCommercialDate(string CurrentDate)
-        ////{
-        ////    string sUpdateOfferReceiveDate = @"update tdmisg140200 set t_ofdt= '" + CurrentDate + "'  where t_docn='" + PMDLdocDesc + "'";
+        public double GeRFQraisedDrawingCount()
+        {
+            string sRFQraisedDrawing = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '"+Project+"' and t_rfqd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
+            var outputParam=(SqlHelper.ExecuteScalar(Con129, CommandType.Text, sRFQraisedDrawing));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public double GetRFQRaisedDrawingWeight()
+        {
+            string sRFQraisedDrawingWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_rfqd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sRFQraisedDrawingWeight));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public double GetTechOfferReceivedDrawingWeight()
+        {
+            string sGetTechOfferReceivedDrawingWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechOfferReceivedDrawingWeight));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public double GetCuurentRFQ_OfferReceivedDrawingWeight( string PMDLDocNum)
+        {
+            string sGetTechOfferReceivedDrawingWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNum + @") ";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechOfferReceivedDrawingWeight));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public double GetCuurentRFQComNegotiation_OfferReceivedDrawingWeight(string PMDLDocNum)
+        {
+            string sGetTechOfferReceivedDrawingWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNum + @")  ";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechOfferReceivedDrawingWeight));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public double GetTechnoComNegotiationWeight( string PMDLDocNum)
+        {
+            string sGetTechnoComNegotiationWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNum + @")  ";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechnoComNegotiationWeight));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public double GetTotalDrawingWeight()
+        {
+            string sTotalDrawingWeight = @"select sum(t_pwgt) from ttpisg239200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "'";
+           var outputParam=SqlHelper.ExecuteScalar(Con129, CommandType.Text, sTotalDrawingWeight);
+           if( !Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        //GeTechOfferReceievedDrawingCount GetTotalDrawingWeight
+        public double GeTechOfferReceievedDrawingCount( string PMDLDocNo)
+        {
+            string sTechOfferReceievedDrawingCount = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNo + ")";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sTechOfferReceievedDrawingCount));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
 
-        ////    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateOfferReceiveDate);
-        ////}
+        public double GetTechnoComNegotiationrawingCount( string PMDLDocNo)
+        {
+            string sGetTechnoComNegotiationrawingCount = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNo + ")";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechnoComNegotiationrawingCount));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public double GetTotalInquirySentCount()
+        {
+            string sGetTotalInquirySentCount = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTotalInquirySentCount));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
 
-        //public string GetItemRefType()
-        //{
-        //    string sGetItemRefType = @"select t_icls from ttpisg239200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' ";
-        //    var outputParam= SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetItemRefType);
-        //    if (!(outputParam ==null))
-        //        return (outputParam).ToString();
-        //    else return "";
-        //}
-        //public double GeTotalDrawingCount()
-        //{
-        //    string sTotalDrawing = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference+ "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sTotalDrawing));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-
-        //public double GeRFQraisedDrawingCount()
-        //{
-        //    string sRFQraisedDrawing = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '"+Project+"' and t_rfqd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
-        //    var outputParam=(SqlHelper.ExecuteScalar(Con129, CommandType.Text, sRFQraisedDrawing));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public double GetRFQRaisedDrawingWeight()
-        //{
-        //    string sRFQraisedDrawingWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_rfqd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sRFQraisedDrawingWeight));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public double GetTechOfferReceivedDrawingWeight()
-        //{
-        //    string sGetTechOfferReceivedDrawingWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechOfferReceivedDrawingWeight));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public double GetCuurentRFQ_OfferReceivedDrawingWeight( string PMDLDocNum)
-        //{
-        //    string sGetTechOfferReceivedDrawingWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNum + @") ";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechOfferReceivedDrawingWeight));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public double GetCuurentRFQComNegotiation_OfferReceivedDrawingWeight(string PMDLDocNum)
-        //{
-        //    string sGetTechOfferReceivedDrawingWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNum + @")  ";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechOfferReceivedDrawingWeight));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public double GetTechnoComNegotiationWeight( string PMDLDocNum)
-        //{
-        //    string sGetTechnoComNegotiationWeight = @"select sum(t_dpwt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNum + @")  ";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechnoComNegotiationWeight));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public double GetTotalDrawingWeight()
-        //{
-        //    string sTotalDrawingWeight = @"select sum(t_pwgt) from ttpisg239200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "'";
-        //   var outputParam=SqlHelper.ExecuteScalar(Con129, CommandType.Text, sTotalDrawingWeight);
-        //   if( !Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        ////GeTechOfferReceievedDrawingCount GetTotalDrawingWeight
-        //public double GeTechOfferReceievedDrawingCount( string PMDLDocNo)
-        //{
-        //    string sTechOfferReceievedDrawingCount = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNo + ")";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sTechOfferReceievedDrawingCount));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-
-        //public double GetTechnoComNegotiationrawingCount( string PMDLDocNo)
-        //{
-        //    string sGetTechnoComNegotiationrawingCount = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG' and t_docn in (" + PMDLDocNo + ")";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechnoComNegotiationrawingCount));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public double GetTotalInquirySentCount()
-        //{
-        //    string sGetTotalInquirySentCount = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and t_orgn='ISG'";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTotalInquirySentCount));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-
-        //}
-        ////GetTotalInquirySentCount
+        }
+        //GetTotalInquirySentCount
         //public void UpdateDrawingpercentage(double Drawingpercentage)
         //{
         //    string sUpdateDrawingpercentage = @"update ttpisg220200 set t_cpgv='" + Drawingpercentage + "' where t_sub1='" + ItemReference + "' and t_bohd='"+ BusinessObjectHandle + "' and t_cprj='"+Project+"' ";
         //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateDrawingpercentage);
         //}
-        ////UpdateTechOfferReceivedDrawingpercentage
+        //UpdateTechOfferReceivedDrawingpercentage
         //public void UpdateTechOfferReceivedDrawingpercentage(double Drawingpercentage)
         //{
         //    string sUpdateTechOfferReceivedDrawingpercentage = @"update ttpisg220200 set t_cpgv='" + Drawingpercentage + "' where t_sub1='" + ItemReference + "' and t_bohd='" + BusinessObjectHandle + "'  and t_cprj='" + Project + "' ";
         //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateTechOfferReceivedDrawingpercentage);
         //}
-        ////GetTotalWeight
-        //public double GetTotalWeight(string PMDLDoc)
-        //{
+        //GetTotalWeight
+        public double GetTotalWeight(string PMDLDoc)
+        {
 
 
-        //    string sGetTotalInquirySentCount = @"select sum(a.t_wght)from tdmisg002200 a
-        //                                         join tdmisg140200 b on a.t_docn = b.t_docn
-        //                                         where b.t_docn in (" + PMDLDoc + @") and
-        //                                        b.t_iref ='" + ItemReference + "' and b.t_cprj = '" + Project + "' and b.t_orgn='ISG'";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTotalInquirySentCount));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
+            string sGetTotalInquirySentCount = @"select sum(a.t_wght)from tdmisg002200 a
+                                                 join tdmisg140200 b on a.t_docn = b.t_docn
+                                                 where b.t_docn in (" + PMDLDoc + @") and
+                                                b.t_iref ='" + ItemReference + "' and b.t_cprj = '" + Project + "' and b.t_orgn='ISG'";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTotalInquirySentCount));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
 
-        //public double GetTotalWeight()
-        //{
-        //    string sGetTotalInquirySentCount = @"select sum(t_pwgt) from ttpisg239200 where t_iref  ='" + ItemReference + "' and t_cprj= '" + Project + "' ";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTotalInquirySentCount));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
+        public double GetTotalWeight()
+        {
+            string sGetTotalInquirySentCount = @"select sum(t_pwgt) from ttpisg239200 where t_iref  ='" + ItemReference + "' and t_cprj= '" + Project + "' ";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTotalInquirySentCount));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
 
-        ////UpdateTechnoCommercialpercentage
+        //UpdateTechnoCommercialpercentage
         //public void UpdateTechnoCommercialpercentage(double percentage)
         //{
         //    string sUpdateTechnoCommercialpercentage = @"update ttpisg220200 set t_cpgv='" + percentage + "' where t_sub1='" + ItemReference + "' and t_bohd='" + BusinessObjectHandle + "'  and t_cprj='" + Project + "' ";
         //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateTechnoCommercialpercentage);
         //}
-        ////GeRFQraisedDrawingpercentage UpdateTechnicalClearancepercentage
+        //GeRFQraisedDrawingpercentage UpdateTechnicalClearancepercentage
 
       
-        //public double GeRFQraisedDrawingpercentage()
-        //{
-        //    string sGeRFQraisedDrawingpercentage = @"select t_cpgv from ttpisg220200 where t_sub1='" + ItemReference + "' and t_bohd='CT_RFQRAISED'  and t_cprj='" + Project + "'";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGeRFQraisedDrawingpercentage));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
+        public double GeRFQraisedDrawingpercentage()
+        {
+            string sGeRFQraisedDrawingpercentage = @"select t_cpgv from ttpisg220200 where t_sub1='" + ItemReference + "' and t_bohd='CT_RFQRAISED'  and t_cprj='" + Project + "'";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGeRFQraisedDrawingpercentage));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
        
 
-        ////GetTechnicalvettingpercentage GetTechOfferReceiveCount
-        //public double GetTechnicalvettingpercentage()
-        //{
-        //    string sGetTechnicalvettingpercentage = @"Select t_cpgv from ttpisg220200 where t_sub1='" + ItemReference + "' and t_bohd='CT_PREORDERTECHCLEAR'  and t_cprj='" + Project + "'";
-        //    var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechnicalvettingpercentage));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public DateTime GetMinRFQDate()
-        //{
-        //    string sGetMinRFQDate = @"select Min(t_rfqd) from tdmisg140200 where t_iref='"+ItemReference+ "' and t_cprj= '" + Project + "' and  t_rfqd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
-        //    var outputParam =SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetMinRFQDate);
-        //    if (!(outputParam is DBNull))
-        //        return Convert.ToDateTime(outputParam);
-        //    else return default(DateTime);
+        //GetTechnicalvettingpercentage GetTechOfferReceiveCount
+        public double GetTechnicalvettingpercentage()
+        {
+            string sGetTechnicalvettingpercentage = @"Select t_cpgv from ttpisg220200 where t_sub1='" + ItemReference + "' and t_bohd='CT_PREORDERTECHCLEAR'  and t_cprj='" + Project + "'";
+            var outputParam = (SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTechnicalvettingpercentage));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public DateTime GetMinRFQDate()
+        {
+            string sGetMinRFQDate = @"select Min(t_rfqd) from tdmisg140200 where t_iref='"+ItemReference+ "' and t_cprj= '" + Project + "' and  t_rfqd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
+            var outputParam =SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetMinRFQDate);
+            if (!(outputParam is DBNull))
+                return Convert.ToDateTime(outputParam);
+            else return default(DateTime);
 
-        //}
-        //public DateTime GetMinOfferReceieveDate()
-        //{
-        //    string sGetMinOfferReceieveDate = @"select Min(t_ofdt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and  t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
-        //    var outputParam = SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetMinOfferReceieveDate);
-        //    if (!(outputParam is DBNull))
-        //        return Convert.ToDateTime(outputParam);
-        //    else return default(DateTime);
+        }
+        public DateTime GetMinOfferReceieveDate()
+        {
+            string sGetMinOfferReceieveDate = @"select Min(t_ofdt) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and  t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
+            var outputParam = SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetMinOfferReceieveDate);
+            if (!(outputParam is DBNull))
+                return Convert.ToDateTime(outputParam);
+            else return default(DateTime);
 
-        //}
-        //public DateTime GetMinTechnoCommecrialDate()
-        //{
-        //    string sGetMinTechnoCommecrialDate = @"select Min(t_cmfd) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and  t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
-        //    var outputParam = SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetMinTechnoCommecrialDate);
-        //    if (!(outputParam is DBNull))
-        //        return Convert.ToDateTime(outputParam);
-        //    else return default(DateTime);
+        }
+        public DateTime GetMinTechnoCommecrialDate()
+        {
+            string sGetMinTechnoCommecrialDate = @"select Min(t_cmfd) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "' and  t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000') and t_orgn='ISG'";
+            var outputParam = SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetMinTechnoCommecrialDate);
+            if (!(outputParam is DBNull))
+                return Convert.ToDateTime(outputParam);
+            else return default(DateTime);
 
-        //}
+        }
         //public void UpdateActualStartDate(string dt)
         //{
         //    string sUpdateActualStartDate = @"update ttpisg220200 set t_acsd=cast('" + dt + "' as DATETIME) where t_sub1='" + ItemReference + "' and t_bohd='" + BusinessObjectHandle + "'  and t_cprj='" + Project + "' ";
@@ -1196,19 +1179,19 @@ namespace PreOrderWorkflow
         //    string sUpdateActualStartDate_tor = @"update ttpisg220200 set t_acsd=cast('" + dt + "' as DATETIME) where t_sub1='" + ItemReference + "' and t_bohd='CT_RFQOFFERECEIVED'  and t_cprj='" + Project + "' ";
         //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateActualStartDate_tor);
         //}
-        //public int GetEnquiryRaisedCount(string PMDL)
-        //{
-        //    //need to ask if PMDLDocNo also to be added in where clause or not  Change 22/08/18 Sagar
-        //    string sGetCount = @"select count(*) from WF1_PreOrder where WF_Status in('Enquiry Raised','Technical offer Received','Enquiry For Techno Commercial Negotiation Completed') and PMDLDocNo='" + PMDL + "'";
-        //    return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetCount));
-        //}
-        ////GetTechOfferReceiveDateCount
-        //public int GetTechOfferReceiveDateCount(string PMDL)
-        //{
-        //    //need to ask if PMDLDocNo also to be added in where clause or not  Change 22/08/18 Sagar
-        //    string sGetCount = @"select count(*) from WF1_PreOrder where WF_Status in('Technical offer Received','Enquiry For Techno Commercial Negotiation Completed') and PMDLDocNo='" + PMDL + "'";
-        //    return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetCount));
-        //}
+        public int GetEnquiryRaisedCount(string PMDL)
+        {
+            //need to ask if PMDLDocNo also to be added in where clause or not  Change 22/08/18 Sagar
+            string sGetCount = @"select count(*) from WF1_PreOrder where WF_Status in('Enquiry Raised','Technical offer Received','Enquiry For Techno Commercial Negotiation Completed') and PMDLDocNo='" + PMDL + "'";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetCount));
+        }
+        //GetTechOfferReceiveDateCount
+        public int GetTechOfferReceiveDateCount(string PMDL)
+        {
+            //need to ask if PMDLDocNo also to be added in where clause or not  Change 22/08/18 Sagar
+            string sGetCount = @"select count(*) from WF1_PreOrder where WF_Status in('Technical offer Received','Enquiry For Techno Commercial Negotiation Completed') and PMDLDocNo='" + PMDL + "'";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetCount));
+        }
         //public void UpdateRFQCount(int nCount)
         //{
         //    string sUpdateRFQCount = @"update ttpisg220200 set t_numv='" + nCount + "' where t_sub1='" + ItemReference + "' and t_bohd='CT_RFQRAISED'  and t_cprj='" + Project + "'";
@@ -1226,105 +1209,105 @@ namespace PreOrderWorkflow
         //    string sUpdateTechnoCommercialCount = @"update ttpisg220200 set t_nutc='" + nCount + "' where t_sub1='" + ItemReference + "' and  t_bohd='CT_RFQCOMMERCIALFINALISED'  and t_cprj='" + Project + "' ";
         //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateTechnoCommercialCount);
         //}
-        //public DataTable GetPMDLFromItemRef()
-        //{
-        //    string sGetPMDLFromItemRef = @"select distinct t_docn from tdmisg140200 where t_iref='" + ItemReference + "'  and t_orgn='ISG'  and t_cprj='" + Project + "'";
-        //    return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sGetPMDLFromItemRef).Tables[0];
+        public DataTable GetPMDLFromItemRef()
+        {
+            string sGetPMDLFromItemRef = @"select distinct t_docn from tdmisg140200 where t_iref='" + ItemReference + "'  and t_orgn='ISG'  and t_cprj='" + Project + "'";
+            return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sGetPMDLFromItemRef).Tables[0];
 
-        //}
-        //public DataTable GetPMDLFromItemRefForOfferReceived()
-        //{
-        //    string sGetPMDLFromItemRef = @"select distinct t_docn from tdmisg140200 where t_iref='" + ItemReference + "'  and t_orgn='ISG'  and t_cprj='" + Project + "' and t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000')";
-        //    return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sGetPMDLFromItemRef).Tables[0];
+        }
+        public DataTable GetPMDLFromItemRefForOfferReceived()
+        {
+            string sGetPMDLFromItemRef = @"select distinct t_docn from tdmisg140200 where t_iref='" + ItemReference + "'  and t_orgn='ISG'  and t_cprj='" + Project + "' and t_ofdt not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000')";
+            return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sGetPMDLFromItemRef).Tables[0];
 
-        //}
+        }
         //PMDLDocForTechnoCommNegotiation
-        //public DataTable GetPMDLDocForTechnoCommNegotiation()
-        //{
-        //    string sGetPMDLFromItemRef = @"select distinct t_docn from tdmisg140200 where t_iref='" + ItemReference + "'  and t_orgn='ISG'  and t_cprj='" + Project + "' and t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000')";
-        //    return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sGetPMDLFromItemRef).Tables[0];
+        public DataTable GetPMDLDocForTechnoCommNegotiation()
+        {
+            string sGetPMDLFromItemRef = @"select distinct t_docn from tdmisg140200 where t_iref='" + ItemReference + "'  and t_orgn='ISG'  and t_cprj='" + Project + "' and t_cmfd not in ('1970-01-01 00:00:00.000','1900-01-01 00:00:00.000')";
+            return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sGetPMDLFromItemRef).Tables[0];
 
-        //}
-        //public int GetTotalChildRecordCount(string PMDLDoc)
-        //{
-        //    string sGetTotalChildRecordCount = @"select count(distinct WF1_PreOrder.WFId) from WF1_PreOrder inner join WF1_PreOrderPMDL
-        //                                        on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
-        //                                        and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
-        //                                        and WF1_PreOrder.Parent_WFID <> 0
-        //                                        and WF1_PreOrder.WF_Status in('Enquiry Raised', 
-        //                                       'Technical offer Received','Enquiry For Techno Commercial Negotiation Completed') and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
-        //    //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='"+ PMDLDoc + "'and Parent_WFID != '0'and WF_Status in ('Enquiry Raised','Technical offer Received')";
-        //    return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTotalChildRecordCount));
-        //}
+        }
+        public int GetTotalChildRecordCount(string PMDLDoc)
+        {
+            string sGetTotalChildRecordCount = @"select count(distinct WF1_PreOrder.WFId) from WF1_PreOrder inner join WF1_PreOrderPMDL
+                                                on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
+                                                and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
+                                                and WF1_PreOrder.Parent_WFID <> 0
+                                                and WF1_PreOrder.WF_Status in('Enquiry Raised', 
+                                               'Technical offer Received','Enquiry For Techno Commercial Negotiation Completed') and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
+            //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='"+ PMDLDoc + "'and Parent_WFID != '0'and WF_Status in ('Enquiry Raised','Technical offer Received')";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTotalChildRecordCount));
+        }
         //GetTotalChildRecordCount_AllOfferReceived
-        //public int GetTotalChildRecordCount_AllOfferReceived(string PMDLDoc)
-        //{
-        //    string sGetTotalChildRecordCount_AllOfferReceived = @"select count(distinct WF1_PreOrder.WFId) from WF1_PreOrder inner join WF1_PreOrderPMDL
-        //                                        on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
-        //                                        and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
-        //                                        and WF1_PreOrder.Parent_WFID <> 0
-        //                                        and WF1_PreOrder.WF_Status in( 
-        //                                       'Technical offer Received','Enquiry For Techno Commercial Negotiation Completed') and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
-        //    //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='"+ PMDLDoc + "'and Parent_WFID != '0'and WF_Status in ('Enquiry Raised','Technical offer Received')";
-        //    return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTotalChildRecordCount_AllOfferReceived));
-        //}
-        //public int AllOfferReceieved_ChildRecordCount(string PMDLDoc)
-        //{
-        //     string sGetTotalChildRecordCount = @"select count(distinct WF1_PreOrder.WFId) from WF1_PreOrder inner join WF1_PreOrderPMDL
-        //                                        on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
-        //                                        and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
-        //                                        and WF1_PreOrder.Parent_WFID <> 0
-        //                                      and WF1_PreOrder.WF_Status in( 'Technical offer Received','Enquiry For Techno Commercial Negotiation Completed')
-        //                                      and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
-        //    //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='"+ PMDLDoc + "'and Parent_WFID != '0'and WF_Status in ('Enquiry Raised','Technical offer Received')";
-        //    return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTotalChildRecordCount));
+        public int GetTotalChildRecordCount_AllOfferReceived(string PMDLDoc)
+        {
+            string sGetTotalChildRecordCount_AllOfferReceived = @"select count(distinct WF1_PreOrder.WFId) from WF1_PreOrder inner join WF1_PreOrderPMDL
+                                                on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
+                                                and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
+                                                and WF1_PreOrder.Parent_WFID <> 0
+                                                and WF1_PreOrder.WF_Status in( 
+                                               'Technical offer Received','Enquiry For Techno Commercial Negotiation Completed') and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
+            //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='"+ PMDLDoc + "'and Parent_WFID != '0'and WF_Status in ('Enquiry Raised','Technical offer Received')";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTotalChildRecordCount_AllOfferReceived));
+        }
+        public int AllOfferReceieved_ChildRecordCount(string PMDLDoc)
+        {
+             string sGetTotalChildRecordCount = @"select count(distinct WF1_PreOrder.WFId) from WF1_PreOrder inner join WF1_PreOrderPMDL
+                                                on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
+                                                and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
+                                                and WF1_PreOrder.Parent_WFID <> 0
+                                              and WF1_PreOrder.WF_Status in( 'Technical offer Received','Enquiry For Techno Commercial Negotiation Completed')
+                                              and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
+            //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='"+ PMDLDoc + "'and Parent_WFID != '0'and WF_Status in ('Enquiry Raised','Technical offer Received')";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTotalChildRecordCount));
 
-        //}
+        }
 
-        //public int TechnoComNegotiation_ChildRecordCount(string PMDLDoc)
-        //{
-        //   string sGetTotalChildRecordCount = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "'  and t_orgn='ISG' "; 
-        //    //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='"+ PMDLDoc + "'and Parent_WFID != '0'and WF_Status in ('Enquiry Raised','Technical offer Received')";
-        //    return Convert.ToInt32(SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTotalChildRecordCount));
+        public int TechnoComNegotiation_ChildRecordCount(string PMDLDoc)
+        {
+           string sGetTotalChildRecordCount = @"select count(*) from tdmisg140200 where t_iref='" + ItemReference + "' and t_cprj= '" + Project + "'  and t_orgn='ISG' "; 
+            //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='"+ PMDLDoc + "'and Parent_WFID != '0'and WF_Status in ('Enquiry Raised','Technical offer Received')";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetTotalChildRecordCount));
 
-        //}
+        }
         //GetQualifiedforTechnoCommercialCount
-        //public double GetQualifiedforTechnoCommercialCount()
-        //{
-        //    string sGetQualifiedforTechnoCommercialCount = @"Select t_numt from ttpisg220200 where t_sub1='" + ItemReference + "' and t_bohd='CT_PREORDERTECHCLEAR'  and t_cprj='" + Project + "'";
-        //    var outputParam=(SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetQualifiedforTechnoCommercialCount));
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToDouble(outputParam);
-        //    else return 0;
-        //}
-        //public int GetTechofferChildRecordCount(string PMDLDoc)
-        //{
-        //    string sGetTechofferChildRecordCount = @"select count(distinct WF1_PreOrder.WFID) from WF1_PreOrder inner join WF1_PreOrderPMDL
-        //                                             on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
-        //                                             and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
-        //                                             and WF1_PreOrder.Parent_WFID <> 0
-        //                                             and WF1_PreOrder.WF_Status in ('Technical offer Received', 
-        //                                             'Enquiry For Techno Commercial Negotiation Completed')  and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
-        //   //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='" + PMDLDoc + "'and Parent_WFID != '0' and WF_Status='Technical offer Received'";
-        //    return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTechofferChildRecordCount));
-        //}
+        public double GetQualifiedforTechnoCommercialCount()
+        {
+            string sGetQualifiedforTechnoCommercialCount = @"Select t_numt from ttpisg220200 where t_sub1='" + ItemReference + "' and t_bohd='CT_PREORDERTECHCLEAR'  and t_cprj='" + Project + "'";
+            var outputParam=(SqlHelper.ExecuteScalar(Con129, CommandType.Text, sGetQualifiedforTechnoCommercialCount));
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToDouble(outputParam);
+            else return 0;
+        }
+        public int GetTechofferChildRecordCount(string PMDLDoc)
+        {
+            string sGetTechofferChildRecordCount = @"select count(distinct WF1_PreOrder.WFID) from WF1_PreOrder inner join WF1_PreOrderPMDL
+                                                     on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
+                                                     and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
+                                                     and WF1_PreOrder.Parent_WFID <> 0
+                                                     and WF1_PreOrder.WF_Status in ('Technical offer Received', 
+                                                     'Enquiry For Techno Commercial Negotiation Completed')  and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
+           //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='" + PMDLDoc + "'and Parent_WFID != '0' and WF_Status='Technical offer Received'";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTechofferChildRecordCount));
+        }
 
-        //public int GetTechnoCommercialChildRecordCount(string PMDLDoc)
-        //{
-        //    string sGetTechnoCommercialChildRecordCount = @"select count(distinct WF1_PreOrder.WFID) from WF1_PreOrder inner join WF1_PreOrderPMDL
-        //                                            on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
-        //                                            and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
-        //                                            and WF1_PreOrder.Parent_WFID <> 0
-        //                                            and WF1_PreOrder.WF_Status in ('Enquiry For Techno Commercial Negotiation Completed')  and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
-        //    //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='" + PMDLDoc + "'and Parent_WFID != '0' and WF_Status='Technical offer Received'";
-        //    return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTechnoCommercialChildRecordCount));
-        //}
+        public int GetTechnoCommercialChildRecordCount(string PMDLDoc)
+        {
+            string sGetTechnoCommercialChildRecordCount = @"select count(distinct WF1_PreOrder.WFID) from WF1_PreOrder inner join WF1_PreOrderPMDL
+                                                    on WF1_PreOrder.Parent_WFID = WF1_PreOrderPMDL.WFID
+                                                    and WF1_PreOrderPMDL.PMDLDocNo in(" + PMDLDoc + @")
+                                                    and WF1_PreOrder.Parent_WFID <> 0
+                                                    and WF1_PreOrder.WF_Status in ('Enquiry For Techno Commercial Negotiation Completed')  and WF1_PreOrder.Parent_WFID='" + Parent_WFID + "'";
+            //@"select count(*) from WF1_PreOrder_History where PMDLDocNo='" + PMDLDoc + "'and Parent_WFID != '0' and WF_Status='Technical offer Received'";
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sGetTechnoCommercialChildRecordCount));
+        }
 
-        //public string GetParenIDStatus(string WFID)
-        //{
-        //    string sStatus = @" select WF_Status from WF1_PreOrder where WFID=" + WFID + " and Parent_WFID='0'";
-        //    return SqlHelper.ExecuteScalar(Con, CommandType.Text, sStatus).ToString();
-        //}
+        public string GetParenIDStatus(string WFID)
+        {
+            string sStatus = @" select WF_Status from WF1_PreOrder where WFID=" + WFID + " and Parent_WFID='0'";
+            return SqlHelper.ExecuteScalar(Con, CommandType.Text, sStatus).ToString();
+        }
 
         //public void UpdateAllTechOfferReceived()
         //{
@@ -1352,43 +1335,43 @@ namespace PreOrderWorkflow
             string sStatus = @"SELECT (ISNULL(MAX(WFID),0))as WfId FROM WF1_PreOrder";
             return Convert.ToInt32(SqlHelper.ExecuteScalar(Con, CommandType.Text, sStatus));
         }
-        //public void InsertPreorderDataToBAN(int WorkFlowID)
-        //{
+        public void InsertPreorderDataToBAN(int WorkFlowID)
+        {
            
-        //    string InsertPreorderDataToBaan = @"INSERT INTO tdmisg168200 ([t_wfid],[t_pwfd],[t_cprj],[t_elem],[t_spec]
-        //        ,[t_docn],[t_bpid],[t_mngr],[t_stat],[t_user],[t_date],[t_supp],[t_snam],[t_rdno],[t_supc],[t_rcno],[t_esub],t_Refcntd,t_Refcntu)
-        //         VALUES
-        //             (" + WorkFlowID + ",'"+Parent_WFID+"' , '" + Project + "','" + Element + @"',
-        //                '" + SpecificationNo + "', '" + PMDLdocDesc + "', '" + Buyer + @"',
-        //                '" + Manager + "', '" + WF_Status + "', '" + UserId + @"',
-        //              '" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "', 0,0,0,0,0,0,0,0)";
-        //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, InsertPreorderDataToBaan);
+            string InsertPreorderDataToBaan = @"INSERT INTO tdmisg168200 ([t_wfid],[t_pwfd],[t_cprj],[t_elem],[t_spec]
+                ,[t_docn],[t_bpid],[t_mngr],[t_stat],[t_user],[t_date],[t_supp],[t_snam],[t_rdno],[t_supc],[t_rcno],[t_esub],t_Refcntd,t_Refcntu)
+                 VALUES
+                     (" + WorkFlowID + ",'"+Parent_WFID+"' , '" + Project + "','" + Element + @"',
+                        '" + SpecificationNo + "', '" + PMDLdocDesc + "', '" + Buyer + @"',
+                        '" + Manager + "', '" + WF_Status + "', '" + UserId + @"',
+                      '" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "', 0,0,0,0,0,0,0,0)";
+            SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, InsertPreorderDataToBaan);
 
-        //}
-        //public int UpdateWF_StatusInBAANTable()
-        //{
-        //    return SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, "Update tdmisg168200 set [t_stat]='" + WF_Status + "',t_date=getDate()  Where [t_wfid]='" + WFID + "'");
-        //}
+        }
+        public int UpdateWF_StatusInBAANTable()
+        {
+            return SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, "Update tdmisg168200 set [t_stat]='" + WF_Status + "',t_date=getDate()  Where [t_wfid]='" + WFID + "'");
+        }
 
-        //public DataTable InserPreOrderHistoryToBAAN()
-        //{
-        //    List<SqlParameter> sqlParamater = new List<SqlParameter>();
-        //    sqlParamater.Add(new SqlParameter("@WFID", WFID));
-        //    sqlParamater.Add(new SqlParameter("@Parent_WFID", Parent_WFID));
-        //    sqlParamater.Add(new SqlParameter("@Project", Project));
-        //    sqlParamater.Add(new SqlParameter("@Element", Element));
-        //    sqlParamater.Add(new SqlParameter("@SpecificationNo", SpecificationNo));
-        //    sqlParamater.Add(new SqlParameter("@PMDLDocNo", PMDLdocDesc));
-        //    sqlParamater.Add(new SqlParameter("@Buyer", Buyer));
-        //    sqlParamater.Add(new SqlParameter("@Manager", Manager));
-        //    sqlParamater.Add(new SqlParameter("@WF_Status", WF_Status));
-        //    sqlParamater.Add(new SqlParameter("@UserId", UserId));
-        //    sqlParamater.Add(new SqlParameter("@Supplier", Supplier));
-        //    sqlParamater.Add(new SqlParameter("@SupplierName", SupplierName));
-        //    sqlParamater.Add(new SqlParameter("@Notes", Notes));
-        //    // return SqlHelper.ExecuteDataset(Con, CommandType.StoredProcedure, "sp_Insert_PreOrder_Workflow_History", sqlParamater.ToArray()).Tables[0];
-        //    return SqlHelper.ExecuteDataset(Con129, CommandType.StoredProcedure, "sp_Insert_PreOrderWorkflowHistory_DataToBAAN", sqlParamater.ToArray()).Tables[0];
-        //}
+        public DataTable InserPreOrderHistoryToBAAN()
+        {
+            List<SqlParameter> sqlParamater = new List<SqlParameter>();
+            sqlParamater.Add(new SqlParameter("@WFID", WFID));
+            sqlParamater.Add(new SqlParameter("@Parent_WFID", Parent_WFID));
+            sqlParamater.Add(new SqlParameter("@Project", Project));
+            sqlParamater.Add(new SqlParameter("@Element", Element));
+            sqlParamater.Add(new SqlParameter("@SpecificationNo", SpecificationNo));
+            sqlParamater.Add(new SqlParameter("@PMDLDocNo", PMDLdocDesc));
+            sqlParamater.Add(new SqlParameter("@Buyer", Buyer));
+            sqlParamater.Add(new SqlParameter("@Manager", Manager));
+            sqlParamater.Add(new SqlParameter("@WF_Status", WF_Status));
+            sqlParamater.Add(new SqlParameter("@UserId", UserId));
+            sqlParamater.Add(new SqlParameter("@Supplier", Supplier));
+            sqlParamater.Add(new SqlParameter("@SupplierName", SupplierName));
+            sqlParamater.Add(new SqlParameter("@Notes", Notes));
+            // return SqlHelper.ExecuteDataset(Con, CommandType.StoredProcedure, "sp_Insert_PreOrder_Workflow_History", sqlParamater.ToArray()).Tables[0];
+            return SqlHelper.ExecuteDataset(Con129, CommandType.StoredProcedure, "sp_Insert_PreOrderWorkflowHistory_DataToBAAN", sqlParamater.ToArray()).Tables[0];
+        }
 
         //public void UpdateTechnoCommercialDate( string DATE)
 
@@ -1397,102 +1380,102 @@ namespace PreOrderWorkflow
         //    SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, sUpdateTechnoCommercialDate);
         //}
 
-        //public int UpdateStatusWFPreOrder_HistoryBaaN()
-        //{
-        //    return SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, @"UPDATE tdmisg169200 SET  t_stat= '" + WF_Status + @"'
-        //                  WHERE t_wfid = '" + WFID + @"' and t_slno='" + SLNO_WFID + "'");
+        public int UpdateStatusWFPreOrder_HistoryBaaN()
+        {
+            return SqlHelper.ExecuteNonQuery(Con129, CommandType.Text, @"UPDATE tdmisg169200 SET  t_stat= '" + WF_Status + @"'
+                          WHERE t_wfid = '" + WFID + @"' and t_slno='" + SLNO_WFID + "'");
 
-        //}
+        }
 
-        //public void InsertIntoItemReferencewiseProgressTable(double Weightpercentage, double Countpercentage)
-        //{
-        //    string sInsertIntoItemReferencewiseProgressTable = @"Insert into WF1_ItemReferencewiseProgress values('" + WFID + @"', 
-        //    '" + Parent_WFID + "','" + BusinessObjectHandle + "','" + ItemReference + "' ,'" + Weightpercentage + @"',
-        //     '" + Countpercentage + "','" + UserId + "','" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "','" + WF_Status + "','" + Project + "' )";
-        //    SqlHelper.ExecuteNonQuery(Con, CommandType.Text, sInsertIntoItemReferencewiseProgressTable);
-        //}
-        //public DataTable GetPercentagebyCount_Weight()
-        //{
-        //    string sGetPercentagebyCount_Weight = @"select sum(a.ProgressByWeight) as WeightPercentage, sum(a.ProgressByCount) 
-        //                                            as CountPercentage, a.Project,a.ItemReference  from WF1_ItemReferencewiseProgress a
-        //                                            where a.project ='" + Project + @"'
-        //                                            and a.ItemReference = '" + ItemReference + @"' 
-        //                                            and a.Businnesshndl = '" + BusinessObjectHandle + @"'
-        //                                            and a.WFID in(select distinct b.WFID from WF1_ItemReferencewiseProgress b
-        //                                            where b.project = '" + Project + @"' and b.ItemReference = '" + ItemReference + @"'
-        //                                            and b.Businnesshndl = '" + BusinessObjectHandle + @"' 
-        //                                            and b.UpdatedDate = (select max(c.UpdatedDate) from WF1_ItemReferencewiseProgress c
-        //                                            where c.parent_WFID =a.parent_WFID
-        //                                            and c.project = '" + Project + @"'
-        //                                            and c.ItemReference = '" + ItemReference + @"'
-        //                                            and c.Businnesshndl = '" + BusinessObjectHandle + @"'
-        //                                            ) )
-        //                                           and a.Parent_WFID not in(select d.parent_WFID from WF1_ItemReferencewiseProgress d
-        //                                           where d.UserAction = 'All Offer Received')
-        //                                           group by a.ItemReference, a.Project
-        //                                           union
-        //                                            select convert(decimal(10, 2), sum(ProgressByWeight)) as WeightPercentage, 
-        //                                            convert(decimal(10, 2), sum(ProgressByCount)) CountPercentage,
-        //                                            Project, ItemReference  from  WF1_ItemReferencewiseProgress a
-        //                                            where project ='" + Project + @"'
-        //                                            and ItemReference = '" + ItemReference + @"' 
-        //                                            and Businnesshndl = '" + BusinessObjectHandle + @"'
-        //                                            and UserAction = 'All Offer Received'
-        //                                            group by ItemReference,Project";
-        //    DataTable dt = SqlHelper.ExecuteDataset(Con, CommandType.Text, sGetPercentagebyCount_Weight).Tables[0];
+        public void InsertIntoItemReferencewiseProgressTable(double Weightpercentage, double Countpercentage)
+        {
+            string sInsertIntoItemReferencewiseProgressTable = @"Insert into WF1_ItemReferencewiseProgress values('" + WFID + @"', 
+            '" + Parent_WFID + "','" + BusinessObjectHandle + "','" + ItemReference + "' ,'" + Weightpercentage + @"',
+             '" + Countpercentage + "','" + UserId + "','" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "','" + WF_Status + "','" + Project + "' )";
+            SqlHelper.ExecuteNonQuery(Con, CommandType.Text, sInsertIntoItemReferencewiseProgressTable);
+        }
+        public DataTable GetPercentagebyCount_Weight()
+        {
+            string sGetPercentagebyCount_Weight = @"select sum(a.ProgressByWeight) as WeightPercentage, sum(a.ProgressByCount) 
+                                                    as CountPercentage, a.Project,a.ItemReference  from WF1_ItemReferencewiseProgress a
+                                                    where a.project ='" + Project + @"'
+                                                    and a.ItemReference = '" + ItemReference + @"' 
+                                                    and a.Businnesshndl = '" + BusinessObjectHandle + @"'
+                                                    and a.WFID in(select distinct b.WFID from WF1_ItemReferencewiseProgress b
+                                                    where b.project = '" + Project + @"' and b.ItemReference = '" + ItemReference + @"'
+                                                    and b.Businnesshndl = '" + BusinessObjectHandle + @"' 
+                                                    and b.UpdatedDate = (select max(c.UpdatedDate) from WF1_ItemReferencewiseProgress c
+                                                    where c.parent_WFID =a.parent_WFID
+                                                    and c.project = '" + Project + @"'
+                                                    and c.ItemReference = '" + ItemReference + @"'
+                                                    and c.Businnesshndl = '" + BusinessObjectHandle + @"'
+                                                    ) )
+                                                   and a.Parent_WFID not in(select d.parent_WFID from WF1_ItemReferencewiseProgress d
+                                                   where d.UserAction = 'All Offer Received')
+                                                   group by a.ItemReference, a.Project
+                                                   union
+                                                    select convert(decimal(10, 2), sum(ProgressByWeight)) as WeightPercentage, 
+                                                    convert(decimal(10, 2), sum(ProgressByCount)) CountPercentage,
+                                                    Project, ItemReference  from  WF1_ItemReferencewiseProgress a
+                                                    where project ='" + Project + @"'
+                                                    and ItemReference = '" + ItemReference + @"' 
+                                                    and Businnesshndl = '" + BusinessObjectHandle + @"'
+                                                    and UserAction = 'All Offer Received'
+                                                    group by ItemReference,Project";
+            DataTable dt = SqlHelper.ExecuteDataset(Con, CommandType.Text, sGetPercentagebyCount_Weight).Tables[0];
 
            
-        //    return dt;
+            return dt;
 
 
 
 
-        //}
+        }
 
-        //public DataTable GetPercentagebyCount_Weight_AllOfferReceievd()
-        //{
-        //    string sGetPercentagebyCount_Weight_AllOfferReceievd = @"select sum(b.ProgressByWeight) as WeightPercentage, sum(b.ProgressByCount) 
-        //                                            as CountPercentage, b.Project,b.ItemReference from WF1_ItemReferencewiseProgress b
-        //                                            where b.project = '" + Project + @"'
-        //                                            and b.ItemReference ='" + ItemReference + @"' 
-        //                                            and b.Businnesshndl = '" + BusinessObjectHandle + @"'
-        //                                            and b.UpdatedDate in (select max(c.UpdatedDate) from WF1_ItemReferencewiseProgress c
-        //                                            where c.project = '" + Project + @"'
-        //                                            and c.ItemReference = '" + ItemReference + @"' 
-        //                                            and c.Businnesshndl = '" + BusinessObjectHandle + @"' group by c.Parent_WFID)
-        //                                            group by ItemReference,Project";
-        //    DataTable dt = SqlHelper.ExecuteDataset(Con, CommandType.Text, sGetPercentagebyCount_Weight_AllOfferReceievd).Tables[0];
-
-
-        //    return dt;
-        //}
+        public DataTable GetPercentagebyCount_Weight_AllOfferReceievd()
+        {
+            string sGetPercentagebyCount_Weight_AllOfferReceievd = @"select sum(b.ProgressByWeight) as WeightPercentage, sum(b.ProgressByCount) 
+                                                    as CountPercentage, b.Project,b.ItemReference from WF1_ItemReferencewiseProgress b
+                                                    where b.project = '" + Project + @"'
+                                                    and b.ItemReference ='" + ItemReference + @"' 
+                                                    and b.Businnesshndl = '" + BusinessObjectHandle + @"'
+                                                    and b.UpdatedDate in (select max(c.UpdatedDate) from WF1_ItemReferencewiseProgress c
+                                                    where c.project = '" + Project + @"'
+                                                    and c.ItemReference = '" + ItemReference + @"' 
+                                                    and c.Businnesshndl = '" + BusinessObjectHandle + @"' group by c.Parent_WFID)
+                                                    group by ItemReference,Project";
+            DataTable dt = SqlHelper.ExecuteDataset(Con, CommandType.Text, sGetPercentagebyCount_Weight_AllOfferReceievd).Tables[0];
 
 
-        //public DataTable GetPMDLbyWFID()
-        //{
-        //    string sGetPercentagebyCount_Weight = @"select PMDLDocNo from WF1_PreOrderPMDL where WFID ='" + WFID + @"' ";
-        //    return SqlHelper.ExecuteDataset(Con, CommandType.Text, sGetPercentagebyCount_Weight).Tables[0];
+            return dt;
+        }
 
-        //}
-        //public DataTable GetTechnoComNegotiationPercentagebyCount_Weight()
-        //{
-        //    string sGetPercentagebyCount_Weight = @"Select sum(ProgressByWeight) as WeightPercentage, sum(ProgressByCount) CountPercentage,
-        //                                          Project, ItemReference from WF1_ItemReferencewiseProgress  where 
-        //                                          Project ='" + Project + "' and ItemReference='" + ItemReference + @"' 
-        //                                          and Businesshndl='CT_RFQCOMMERCIALFINALISED'order by ItemReference,Project ";
-        //    return SqlHelper.ExecuteDataset(Con, CommandType.Text, sGetPercentagebyCount_Weight).Tables[0];
 
-        //}
+        public DataTable GetPMDLbyWFID()
+        {
+            string sGetPercentagebyCount_Weight = @"select PMDLDocNo from WF1_PreOrderPMDL where WFID ='" + WFID + @"' ";
+            return SqlHelper.ExecuteDataset(Con, CommandType.Text, sGetPercentagebyCount_Weight).Tables[0];
 
-        //public int SelectAllOfferReceivedRFQCount()
-        //{
-        //    var outputParam= SqlHelper.ExecuteScalar(Con, CommandType.Text, @"select Count(*)  from WF1_PreOrder_History  where  
-        //                                     WFID ='" + WFID + @"' and WF_Status='All Offer Received'");
+        }
+        public DataTable GetTechnoComNegotiationPercentagebyCount_Weight()
+        {
+            string sGetPercentagebyCount_Weight = @"Select sum(ProgressByWeight) as WeightPercentage, sum(ProgressByCount) CountPercentage,
+                                                  Project, ItemReference from WF1_ItemReferencewiseProgress  where 
+                                                  Project ='" + Project + "' and ItemReference='" + ItemReference + @"' 
+                                                  and Businesshndl='CT_RFQCOMMERCIALFINALISED'order by ItemReference,Project ";
+            return SqlHelper.ExecuteDataset(Con, CommandType.Text, sGetPercentagebyCount_Weight).Tables[0];
 
-        //    if (!Convert.IsDBNull(outputParam))
-        //        return Convert.ToInt32(outputParam);
-        //    else return 0;
-        //}
+        }
+
+        public int SelectAllOfferReceivedRFQCount()
+        {
+            var outputParam= SqlHelper.ExecuteScalar(Con, CommandType.Text, @"select Count(*)  from WF1_PreOrder_History  where  
+                                             WFID ='" + WFID + @"' and WF_Status='All Offer Received'");
+
+            if (!Convert.IsDBNull(outputParam))
+                return Convert.ToInt32(outputParam);
+            else return 0;
+        }
 
 
         #endregion

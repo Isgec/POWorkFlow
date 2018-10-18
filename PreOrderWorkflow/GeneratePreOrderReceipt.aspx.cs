@@ -322,9 +322,8 @@ namespace PreOrderWorkflow
                       revision= Count.ToString().PadLeft(2, '0');
 
                     }
-                    //} "Notes.aspx?handle=J_PREORDER_WORKFLOW&Index=" + Request.QueryString["WFID"] + "&AttachedBy=" + Request.QueryString["u"] + "&RecNo=" + sRECNo + "&Item=" + ddlItem.SelectedValue + "&Indent=" + ddlIndent.SelectedValue + "&Revision=" + revision;
-                    string sAttachOffer = "Notes.aspx?handle=J_PREORDER_WORKFLOW&Index=" + Request.QueryString["WFID"] + "&AttachedBy=" + Request.QueryString["u"] + "&RecNo=" + sRECNo + "&Item=" + ddlItem.SelectedValue + "&Indent=" + ddlIndent.SelectedValue + "&Revision=" + revision;
-                    Response.Redirect(sAttachOffer);
+                    //}
+                    Response.Redirect("Notes.aspx?handle=J_PREORDER_WORKFLOW&Index=" + Request.QueryString["WFID"] + "&WFPID=" + Request.QueryString["WFPID"] + "&AttachedBy=" + Request.QueryString["u"] + "&RecNo=" + sRECNo + "&Item=" + ddlItem.SelectedValue + "&Indent=" + ddlIndent.SelectedValue + "&Revision=" + revision);
                     // //IDMSRECEIPTS_200 workflow handle= J_PREORDER_WORKFLOW ---- IDMSRECEIPTS_200 JOOMLA_NOTES Notes1126 237
                     // string url = "Notes.aspx?handle=J_PREORDER_WORKFLOW&Index=" + Request.QueryString["WFPID"] + "&AttachedBy=" + Request.QueryString["u"] +"&RecNo=" + sRECNo;
                     //// string url = "http://192.9.200.146/Attachment/Attachment.aspx?AthHandle=JOOMLA_NOTES" + "&Index=" + "Notes1124" + "&AttachedBy=" +"9583" + "&ed=n";
@@ -527,12 +526,12 @@ namespace PreOrderWorkflow
                                         t_adat,t_subm_1,t_orno,t_pono,t_trno,t_docn,t_revn,t_eunt,t_rqno,t_rqln,
                                         t_rcno,t_cprj,t_item,t_bpid,t_user,t_nama,t_date,t_sent_2,t_sent_3,t_sent_4,t_sent_5,
                                         t_sent_6,t_sent_7,t_rece_2,t_rece_3,t_rece_4,t_rece_5,t_rece_6,t_rece_7,t_subm_2,
-                                        t_subm_3,t_subm_4,t_subm_5,t_subm_6,t_subm_7,t_Refcntd,t_Refcntu)  
+                                        t_subm_3,t_subm_4,t_subm_5,t_subm_6,t_subm_7,t_Refcntd,t_Refcntu,t_pwfd,t_wfid)  
                                         values('W',1,2,2,'','','','',2,'',0,'','CRI',
                                        '" + RevisionCount + "', '" + DivisionName + "','" + IndentNo + "','" + LineNo + "','"
                                              + RECNumber + "','" + ProjCode + "','" + itemNo + "','" + SupplierCode + "','" + user
                                              + "',left('" + SupplierName + "',30),'" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")
-                                             + "','','','','','','','','','','','','','','','','','','','','')";
+                                             + "','','','','','','','','','','','','','','','','','','','',''," + Request.QueryString["WFPID"] + "," + Request.QueryString["WFID"] + ")";
 
                     // ";  values('','','','','',0,'',2,'" + RevisionCount + "','" + RECNumber + "','" + nRecord + "','','')";
                     string InsertChildRecord = @"Insert into tdmisg135200 (t_docn,t_revi,t_dsca,t_idoc,t_irev,
@@ -546,17 +545,17 @@ namespace PreOrderWorkflow
                         CmdChild.CommandType = CommandType.Text;
                         CmdChild.ExecuteNonQuery();
                         con.Close();
-                        string PreorderReceiptInsertion = @"Update  WF1_Preorder set ReceiptNo= '" + RECNumber + "' where  WFID=" + Request.QueryString["WFID"] + "";
+                        string PreorderReceiptInsertion = @"Update  WF1_Preorder set ReceiptNo= '" + RECNumber + "' where  WFID=" + Request.QueryString["WFPID"] + "";
                     //// Dump Preorder Data TO BAAN table change 25/08/2018 sagar 
-                    //string PreorderReceiptInsertionToBAAN = @"update tdmisg168200 set t_rcno = '" + RECNumber + "' where  t_wfid =" + Request.QueryString["WFPID"] + " ";
-                    //if (con.State != ConnectionState.Open)
-                    //{
-                    //    con.Open();
-                    //}
-                    //SqlCommand CmdInsertReceiptTOBAAN = new SqlCommand(PreorderReceiptInsertionToBAAN, con);
-                    //CmdInsertReceiptTOBAAN.CommandType = CommandType.Text;
-                    //CmdInsertReceiptTOBAAN.ExecuteNonQuery();
-                    //con.Close();
+                    string PreorderReceiptInsertionToBAAN = @"update tdmisg168200 set t_rcno = '" + RECNumber + "' where  t_wfid =" + Request.QueryString["WFPID"] + " ";
+                    if (con.State != ConnectionState.Open)
+                    {
+                        con.Open();
+                    }
+                    SqlCommand CmdInsertReceiptTOBAAN = new SqlCommand(PreorderReceiptInsertionToBAAN, con);
+                    CmdInsertReceiptTOBAAN.CommandType = CommandType.Text;
+                    CmdInsertReceiptTOBAAN.ExecuteNonQuery();
+                    con.Close();
                     SqlConnection conERPLive = new SqlConnection(csERPLive); // comment out this line after Testing sagar
                         SqlCommand cmdPreorderReceipt = new SqlCommand(PreorderReceiptInsertion, conERPLive); // changeconlive to con sagar
                         cmdPreorderReceipt.CommandType = CommandType.Text;

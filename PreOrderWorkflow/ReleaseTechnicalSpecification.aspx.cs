@@ -70,7 +70,7 @@ namespace PreOrderWorkflow
                     GetData();
                     ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert('Successfully Deleted');", true);
                 }
-           // }
+            //}
         }
 
         protected void btnNewForm_Click(object sender, EventArgs e)

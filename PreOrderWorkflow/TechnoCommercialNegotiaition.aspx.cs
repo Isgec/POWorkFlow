@@ -221,7 +221,7 @@ namespace PreOrderWorkflow
                     //3
                     nTechnoCommercialChildRecordCount += objWorkFlow.GetTechnoCommercialChildRecordCount(PMDLDocs);
                     //4
-                    objWorkFlow.UpdateTechnoCommercialCount(nTechnoCommercialChildRecordCount);
+                    //objWorkFlow.UpdateTechnoCommercialCount(nTechnoCommercialChildRecordCount);
                     double Technicalvettingpercentage = objWorkFlow.GetTechnicalvettingpercentage();
                     if (nTotalChildRecordCount != 0 && nTotalDrawingCount !=0)
                     {
@@ -272,17 +272,17 @@ namespace PreOrderWorkflow
                             {
                                 if ((percentage_byCount >= percentage_byWeight))
                                 {
-                                    objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                    //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
                                 }
                                 else
                                 {
                                     if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
                                     {
-                                        objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight);
+                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight);
                                     }
                                     else
                                     {
-                                        objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
                                     }
                                 }
                             }
@@ -291,11 +291,11 @@ namespace PreOrderWorkflow
                             {
                                 if (percentage_byCount >= 100)
                                 {
-                                    objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
+                                   // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
                                 }
                                 else
                                 {
-                                    objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                   // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
                                 }
                             }
                     //    }
@@ -318,7 +318,7 @@ namespace PreOrderWorkflow
                     if (MinTechnoCommecrialDate != default(DateTime))
                     {
                         string OfferReceieveDate = MinTechnoCommecrialDate.ToString("yyyy-MM-dd hh:mm:ss");
-                        objWorkFlow.UpdateTechnoCommercialDate(OfferReceieveDate);
+                      //  objWorkFlow.UpdateTechnoCommercialDate(OfferReceieveDate);
                     }
 
                     }
@@ -371,6 +371,15 @@ namespace PreOrderWorkflow
             DataTable dtWFHID = objWorkFlow.InserPreOrderHistory();
             objWorkFlow.Notes = " ";
             objWorkFlow.InserPreOrderHistoryToBAAN();// Dump Preorder Data TO BAAN table change 25/08/2018 sagar
+        }
+
+        protected void btnIdmsReceipt_Click(object sender, EventArgs e)
+        {
+            if (Request.QueryString["Status"] == "Technical offer Received")
+            {
+                Response.Redirect("GeneratePreOrderReceipt.aspx?u=" + Request.QueryString["u"] + "&WFID=" + Request.QueryString["WFID"] + "&WFPID=" + hdfParentWFID.Value);
+            }
+
         }
     }
  }

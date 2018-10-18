@@ -28,21 +28,21 @@ namespace PreOrderWorkflow
                 }
                 if (Request.QueryString["Status"] == "Technical offer Received")
                 {
-                    //int nCount = 0;
-                    //objWorkFlow = new WorkFlow();
-                    //objWorkFlow.WFID = Convert.ToInt32(Request.QueryString["WFPID"]);
-                    // nCount = objWorkFlow.SelectAllOfferReceivedRFQCount();
-                    //if (nCount > 0)
-                    //{
-                    //    btnSendEnquiry.Visible = false;
-                    //    ddlSupplier.Enabled = false;
-                    //    txtSupplier.Enabled = false;
-                    //    txtSupplierEmail.Enabled = false;
-                    //    trNotes.Visible = false;
-                    //    txtNotes.Text = "";
-                   //}
-                   // else
-                   // {
+                    int nCount = 0;
+                    objWorkFlow = new WorkFlow();
+                    objWorkFlow.WFID = Convert.ToInt32(Request.QueryString["WFPID"]);
+                     nCount = objWorkFlow.SelectAllOfferReceivedRFQCount();
+                    if (nCount > 0)
+                    {
+                        btnSendEnquiry.Visible = false;
+                        ddlSupplier.Enabled = false;
+                        txtSupplier.Enabled = false;
+                        txtSupplierEmail.Enabled = false;
+                        trNotes.Visible = false;
+                        txtNotes.Text = "";
+                    }
+                    else
+                    {
                         btnSendEnquiry.Text = "Technical offer Received";
                         // ddlSupplier.Enabled = false;
                         txtSupplier.Enabled = false;
@@ -53,6 +53,7 @@ namespace PreOrderWorkflow
                         btnIdmsReceipt.Visible = true;
                         //btn Generate IDMS Receipt. visible= true
                     }
+                }
                 if (Request.QueryString["Status"] == "Isgec Comment Submitted")
                 {
                     btnSendEnquiry.Text = "Release comments";
@@ -152,7 +153,7 @@ namespace PreOrderWorkflow
                 {
                     ddlSupplier.Enabled = false;
                 }
-
+                
                 //  ddlSupplier.Items.FindByText(dt.Rows[0]["SupplierCode"].ToString()).Selected = true;
                 // txtSupplier.Text = dt.Rows[0]["SupplierName"].ToString();    
                 //}
@@ -177,7 +178,7 @@ namespace PreOrderWorkflow
                 Session["RandomNo"] = hdfRandomNo.Value;
                 Session["Parent_WFID"] = hdfParentWFID.Value;
 
-
+               
             }
         }
         private void GetSupplier()
@@ -231,6 +232,26 @@ namespace PreOrderWorkflow
             {
                 string MailTo = string.Empty;
 
+                //if (ddlSupplier.SelectedValue.ToString().Contains("-"))
+                //{
+                //    string[] supplier = txtSupplier.Text.Split('-');
+
+                //    if (supplier[1] !=null && Regex.IsMatch(supplier[1], @"[^ a - zA - Z0 - 9]"))
+                //    {
+                //        objWorkFlow.SupplierName = supplier[0];
+                //        objWorkFlow.SupplierCode = supplier[1];
+                //    }
+                //    else
+                //    {
+                //        objWorkFlow.SupplierName = txtSupplier.Text;
+                //       objWorkFlow.SupplierCode = "";
+                //    }
+                //}
+                //else
+                //{
+                //    objWorkFlow.SupplierName = txtSupplier.Text;
+                //    objWorkFlow.SupplierCode = "";
+                //} 
                 if (ddlSupplier.SelectedValue != "Select")
                 {
                     objWorkFlow.SupplierCode = ddlSupplier.SelectedValue;
@@ -241,14 +262,14 @@ namespace PreOrderWorkflow
                 }
                 objWorkFlow.SupplierName = txtSupplier.Text;
                 objWorkFlow.WFID = Convert.ToInt32(Request.QueryString["WFID"]);
-                objWorkFlow.Parent_WFID = Convert.ToInt32(Request.QueryString["WFPID"]);
+                objWorkFlow.Parent_WFID= Convert.ToInt32(Request.QueryString["WFPID"]);
                 objWorkFlow.WF_Status = Request.QueryString["Status"];
                 objWorkFlow.UserId = Request.QueryString["u"];
                 objWorkFlow.Supplier = txtSupplierEmail.Text.Trim();
                 objWorkFlow.EmailSubject = txtEmailSub.Text.Trim();
                 objWorkFlow.RandomNo = RandomNo != "" ? RandomNo : hdfRandomNo.Value;
                 int res = objWorkFlow.UpdateEnquiryRaised();
-                // objWorkFlow.UpdateWF_StatusInBAANTable(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar 
+                objWorkFlow.UpdateWF_StatusInBAANTable(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar 
                 if (res > 0)
                 {
                     string IndexValue = InsertPreHistory(Convert.ToInt32(Request.QueryString["WFID"]), Request.QueryString["Status"]);
@@ -332,10 +353,783 @@ namespace PreOrderWorkflow
                                     }
 
                                     objWorkFlow.InsertPreOrderDatatoControlTowerChildTable();
-                                }
+
+                                    if (Request.QueryString["Status"] == "Enquiry Raised")
+                                    {
+                                        // update t_rfqd in tdmisg140200 table 
+                                        //change - 21-08-2018
+                                       
+                                        DataTable dataTable = objWorkFlow.GetRaisedEnquiryDate();
+                                        objWorkFlow.ItemReference = (string)dataTable.Rows[0]["t_iref"];
+                                        string Itemref_Typ = objWorkFlow.GetItemRefType();
+
+                                        if (dataTable.Rows[0]["RaisedDate"].ToString() == "01-01-1970" || dataTable.Rows[0]["RaisedDate"].ToString() == "01-01-1900")
+                                        {
+                                            string CurrentDate = DateTime.Now.ToString("yyyy-MM-dd");
+                                            objWorkFlow.UpdateRaisedEnquiryDate(CurrentDate);
+                                        }
+                                       
+                                            // update t_acsd in table ttpisg220200 with the Min of t_rfqd for the given item ref and t_bohd
+
+                                            DateTime MinRFQdate = objWorkFlow.GetMinRFQDate();
+                                            if (MinRFQdate != default(DateTime))
+                                            {
+                                                string MinRaisedEnquiryDate = MinRFQdate.ToString("yyyy-MM-dd hh:mm:ss");
+                                               // objWorkFlow.UpdateActualStartDate(MinRaisedEnquiryDate);
+                                            }
+                                       
+
+                                        // update % field t_cpgv of table ttpisg220200 with (Drawings for which 
+                                        // raised Date is updated /No of Total drawings)* 100 
+                                        //against a particular pair of busisness handle and Item reference
+
+                                        //double RFQraisedDrawingCount = objWorkFlow.GeRFQraisedDrawingCount();
+                                        //double TotalDrawingCount = objWorkFlow.GeTotalDrawingCount();
+                                        //double EnquiryRaisedpercentage = objWorkFlow.GeRFQraisedDrawingpercentage();
+                                        //double percentageRaisedDrawing = Math.Round((RFQraisedDrawingCount / TotalDrawingCount), 3) * 100;
+                                        //objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawing);
+                                        double percentageRaisedDrawingbyWeight = 0;
+                                        double percentageRaisedDrawing = 0;
+                                        double RFQraisedDrawingCount = objWorkFlow.GeRFQraisedDrawingCount();
+                                        double TotalDrawingCount = objWorkFlow.GeTotalDrawingCount();
+                                        if (TotalDrawingCount != 0)
+                                        {
+                                             percentageRaisedDrawing = Math.Round((RFQraisedDrawingCount / TotalDrawingCount), 4) * 100;
+                                        }
+                                        
+                                        double RFQRaisedDrawingWeight = objWorkFlow.GetRFQRaisedDrawingWeight();
+                                        double TotalRaisedDrawingWeight = objWorkFlow.GetTotalDrawingWeight();
+                                        if (TotalRaisedDrawingWeight != 0)
+                                        {
+                                             percentageRaisedDrawingbyWeight = Math.Round((RFQRaisedDrawingWeight / TotalRaisedDrawingWeight), 4) * 100;
+                                        }
+                                        
+
+                                        if (percentageRaisedDrawing < 100.00 && percentageRaisedDrawingbyWeight < 100.00)
+                                        {
+                                            if ((percentageRaisedDrawing >= percentageRaisedDrawingbyWeight))
+                                            {
+                                               // objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawing);
+                                            }
+                                            else
+                                            {
+                                                if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
+                                                {
+                                                  //  objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawingbyWeight);
+                                                }
+                                                else
+                                                {
+                                                   // objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawing);
+                                                }
+                                            }
+                                        }
+
+                                        else
+                                        {
+                                            if (percentageRaisedDrawing >= 100)
+                                            {
+                                               // objWorkFlow.UpdateDrawingpercentage(100);
+                                            }
+                                            else
+                                            {
+                                               // objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawing);
+                                            }
+                                        }
+
+                                       // objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawing);-- changed this to above on 11-09-18 sagar
+                                        // Update total number of count for which enquiry is sent to Vendor against each PMDL Doc
+                                        //First search the total number of count against Parent WFID for which child IDs are in 
+                                        //'Raised Enquiry' status then store this count  in t_numv of table tdmisg140200
+                                        string parent_id = Request.QueryString["WFPID"];
+                                        objWorkFlow.Parent_WFID = Convert.ToInt32(parent_id);
+                                        //int nCount = objWorkFlow.GetEnquiryRaisedCount(parent_id);
+                                        DataTable dtPMDLDoc = objWorkFlow.GetPMDLFromItemRef();
+                                        int nCount = 0;
+                                        string PMDL = "";
+                                        if (dtPMDLDoc.Rows.Count > 0)
+                                        {
+
+                                            for (int i = 0; i < dtPMDLDoc.Rows.Count; i++)
+                                            {
+
+                                                if (i == 0)
+                                                {
+                                                    PMDL = "'" + dtPMDLDoc.Rows[0]["t_docn"].ToString() + "'";
+                                                }
+                                                else
+                                                {
+                                                    PMDL += ",'" + dtPMDLDoc.Rows[i]["t_docn"].ToString() + "'";
+                                                }
+
+                                            }
+                                            nCount= objWorkFlow.GetTotalChildRecordCount(PMDL);
+                                            //foreach (DataRow drow in dtPMDLDoc.Rows)
+                                            //{
+                                            //    string sPMDLDoc = drow["t_docn"].ToString();
+                                            //    nCount += objWorkFlow.GetEnquiryRaisedCount(sPMDLDoc);
+                                            //    //nTotalChildRecordCount += objWorkFlow.GetTotalChildRecordCount(sPMDLDoc);
+                                            //    //nTechofferChildRecordCount += objWorkFlow.GetTechofferChildRecordCount(sPMDLDoc);
+                                            //}
+                                        }
+                                      //  objWorkFlow.UpdateRFQCount(nCount);
+                                    }
+                                   
+                                    if (Request.QueryString["Status"] == "Technical offer Received")
+                                    {
+                                        double nTotalChildRecordCount = 0;
+                                        double nTechofferChildRecordCount = 0;
+                                        double nOfferRecevied = 0;
+                                        double nTotalInquirySent = 0;
+                                        double nTotalWeight = 0;
+                                        double nTotalWeightForOfferReceieved = 0;
+                                        string PMDLDocs = "";
+                                        string PMDLDocuments = "";
+                                        string PMDLDocNo = "";
+                                        double percentageTechOfferReceivedDrawing_byDrawing=0;
+                                        double percentageTechOfferReceivedDrawing_byWeight=0;
+                                        DataTable dataTable1 = objWorkFlow.GetTechOfferReceiveDate();
+                                        objWorkFlow.ItemReference = (string)dataTable1.Rows[0]["t_iref"];
+
+                                        string Itemref_Typ = objWorkFlow.GetItemRefType();
+
+                                        if (dataTable1.Rows[0]["OfferReceiveDate"].ToString() == "01-01-1970" || dataTable1.Rows[0]["OfferReceiveDate"].ToString() == "01-01-1900")
+                                        {
+                                            string CurrentDate = DateTime.Now.ToString("yyyy-MM-dd");
+                                            objWorkFlow.UpdateOfferReceiveDate(CurrentDate);
+                                        }
+                                        DateTime MinOfferReceieveDate = objWorkFlow.GetMinOfferReceieveDate();
+                                        if (MinOfferReceieveDate != default(DateTime))
+                                        {
+                                            string OfferReceieveDate = MinOfferReceieveDate.ToString("yyyy-MM-dd hh:mm:ss");
+                                           // objWorkFlow.UpdateActualStartDate_tor(OfferReceieveDate);
+                                        }
+
+                                        string parent_id1 = Request.QueryString["WFPID"];
+                                        string sStatus = objWorkFlow.GetParenIDStatus(parent_id1);
+
+                                        if (sStatus == "All Offer Received")
+                                        {
+                                            percentageTechOfferReceivedDrawing_byDrawing = 100;
+                                        }
+                                        else
+                                        {
+                                            DataTable dtPMDLDoc = objWorkFlow.GetPMDLFromItemRef();
+                                            //if(dtPMDLDoc.Rows.Count>0)
+                                            //{
+
+                                            //    foreach (DataRow drow in dtPMDLDoc.Rows)
+                                            //    {
+                                            //        string sPMDLDoc = drow["t_docn"].ToString();
+                                            //        nTotalChildRecordCount+=objWorkFlow.GetTotalChildRecordCount(sPMDLDoc);
+                                            //        nTechofferChildRecordCount += objWorkFlow.GetTechofferChildRecordCount(sPMDLDoc);
+                                            //    }
+                                            // }
+
+                                            if (dtPMDLDoc.Rows.Count > 0)
+                                            {
+
+                                                for (int i = 0; i < dtPMDLDoc.Rows.Count; i++)
+                                                {
+
+                                                    if (i == 0)
+                                                    {
+                                                        PMDLDocs = "'" + dtPMDLDoc.Rows[0]["t_docn"].ToString() + "'";
+                                                    }
+                                                    else
+                                                    {
+                                                        PMDLDocs += ",'" + dtPMDLDoc.Rows[i]["t_docn"].ToString() + "'";
+                                                    }
+
+                                                }
+                                            }
+                                            DataTable dtPMDLDocForOfferReceieved = objWorkFlow.GetPMDLFromItemRefForOfferReceived();
+                                            if (dtPMDLDocForOfferReceieved.Rows.Count > 0)
+                                            {
+
+                                                for (int i = 0; i < dtPMDLDocForOfferReceieved.Rows.Count; i++)
+                                                {
+
+                                                    if (i == 0)
+                                                    {
+                                                        PMDLDocuments = "'" + dtPMDLDocForOfferReceieved.Rows[0]["t_docn"].ToString() + "'";
+                                                    }
+                                                    else
+                                                    {
+                                                        PMDLDocuments += ",'" + dtPMDLDocForOfferReceieved.Rows[i]["t_docn"].ToString() + "'";
+                                                    }
+
+                                                }
+                                            }
+                                            int sWFID1 = objWorkFlow.WFID;
+                                            objWorkFlow.WFID = objWorkFlow.Parent_WFID;
+                                            DataTable dtPMDLbyWFID = objWorkFlow.GetPMDLbyWFID();
+                                            if (dtPMDLbyWFID.Rows.Count > 0)
+                                            {
+
+                                                for (int i = 0; i < dtPMDLbyWFID.Rows.Count; i++)
+                                                {
+
+                                                    if (i == 0)
+                                                    {
+                                                        PMDLDocNo = "'" + dtPMDLbyWFID.Rows[0]["PMDLDocNo"].ToString() + "'";
+                                                    }
+                                                    else
+                                                    {
+                                                        PMDLDocNo += ",'" + dtPMDLbyWFID.Rows[i]["PMDLDocNo"].ToString() + "'";
+                                                    }
+
+                                                }
+                                            }
+
+                                            objWorkFlow.WFID = sWFID1;
+                                            nTotalChildRecordCount = objWorkFlow.GetTotalChildRecordCount(PMDLDocs);
+                                            nTechofferChildRecordCount = objWorkFlow.GetTechofferChildRecordCount(PMDLDocs);
+                                           // nTotalWeight += objWorkFlow.GetTotalWeight(PMDLDocs);
+                                            nTotalWeight = objWorkFlow.GetTotalWeight();
+                                            nTotalWeightForOfferReceieved = objWorkFlow.GetTotalWeight(PMDLDocNo);
+                                            //  double EnquiryRaisedpercentage = objWorkFlow.GeRFQraisedDrawingpercentage();
+                                            nTotalInquirySent = objWorkFlow.GetTotalInquirySentCount();
+                                            nOfferRecevied = objWorkFlow.GeTechOfferReceievedDrawingCount(PMDLDocNo);
+
+                                            if (nTotalChildRecordCount != 0 && nTotalInquirySent!=0)
+                                            {
+                                                percentageTechOfferReceivedDrawing_byDrawing = Math.Round((nTechofferChildRecordCount / nTotalChildRecordCount) * (nOfferRecevied/ nTotalInquirySent)* 100, 4);
+                                            }
+                                            else
+                                            {
+                                                percentageTechOfferReceivedDrawing_byDrawing = 0;
+                                            }
+
+                                            if (nTotalChildRecordCount != 0 && nTotalWeight != 0)
+                                            {
+                                                percentageTechOfferReceivedDrawing_byWeight = Math.Round((nTechofferChildRecordCount / nTotalChildRecordCount) * (nTotalWeightForOfferReceieved / nTotalWeight) * 100, 4);
+                                            }
+                                            else
+                                            {
+                                                percentageTechOfferReceivedDrawing_byWeight = 0;
+                                            }
+                                        }
+                                        string parent_id2 = Request.QueryString["WFPID"];
+                                        objWorkFlow.Parent_WFID = Convert.ToInt32(parent_id2);
+
+                                        objWorkFlow.InsertIntoItemReferencewiseProgressTable(percentageTechOfferReceivedDrawing_byWeight, percentageTechOfferReceivedDrawing_byDrawing);
+                                        DataTable dtPercentage1 = objWorkFlow.GetPercentagebyCount_Weight();
+                                        double percentage_byCount = 0;
+                                        double percentage_byWeight = 0;
+                                        if (dtPercentage1.Rows.Count > 0)
+                                        {
+                                            foreach (DataRow dr2 in dtPercentage1.Rows)
+                                            {
+                                                objWorkFlow.Project = dr2["Project"].ToString();
+                                                objWorkFlow.ItemReference = dr2["ItemReference"].ToString();
+                                                percentage_byCount += Convert.ToDouble(dr2["CountPercentage"]);
+                                                percentage_byWeight += Convert.ToDouble(dr2["WeightPercentage"]);
+                                            }
+                                        }
+                                                if (percentage_byCount < 100.00 && percentage_byWeight < 100.00)
+                                                {
+                                                    if ((percentage_byCount >= percentage_byWeight))
+                                                    {
+                                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Itemref_Typ == "4")// when item reference typ=="Self Engineered" then only update with weight %
+                                                        {
+                                                          //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight);
+                                                        }
+                                                        else
+                                                        {
+                                                            //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                                        }
+                                                    }
+                                                }
+
+                                                else
+                                                {
+                                                    if (percentage_byCount >= 100)
+                                                    {
+                                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
+                                                    }
+                                                    else
+                                                    {
+                                                      //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                                    }
+                                                }
+                                        //    }
+                                        //}
+
+                                        //if (percentageTechOfferReceivedDrawing_byDrawing >= 100.00 || percentageTechOfferReceivedDrawing_byWeight >= 100.00)
+                                        //{
+                                        //    objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
+                                        //}
+                                        //else if  (percentageTechOfferReceivedDrawing_byDrawing >= percentageTechOfferReceivedDrawing_byWeight)
+                                        //{
+                                        //    objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentageTechOfferReceivedDrawing_byDrawing);
+                                        //}
+                                        //else
+                                        //{
+                                        //    objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentageTechOfferReceivedDrawing_byWeight);
+                                        //}
+                                        //double RFQraisedDrawingCount = objWorkFlow.GeRFQraisedDrawingCount();
+                                        //double TotalDrawingCount = objWorkFlow.GeTotalDrawingCount();
+                                        //double EnquiryRaisedpercentage = objWorkFlow.GeRFQraisedDrawingpercentage();
+                                        //double percentageTechOfferReceivedDrawing = Math.Round((RFQraisedDrawingCount / TotalDrawingCount) * EnquiryRaisedpercentage, 3);
+                                        //objWorkFlow.UpdateDrawingpercentage(percentageTechOfferReceivedDrawing);
+                                        //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentageTechOfferReceivedDrawing);
+
+
+                                        //string parent_id = Request.QueryString["WFPID"];
+                                        //// int nCount = objWorkFlow.GetTechOfferReceiveDateCount(parent_id);
+                                        //int nCount = 0;
+                                        //DataTable dtPMDLDoc1 = objWorkFlow.GetPMDLFromItemRef();
+                                        //if (dtPMDLDoc1.Rows.Count > 0)
+                                        //{
+
+                                        //    foreach (DataRow drow in dtPMDLDoc1.Rows)
+                                        //    {
+                                        //        string sPMDLDoc = drow["t_docn"].ToString();
+                                        //        nCount += objWorkFlow.GetTechOfferReceiveDateCount(sPMDLDoc);
+                                        //        //nTotalChildRecordCount += objWorkFlow.GetTotalChildRecordCount(sPMDLDoc);
+                                        //        //nTechofferChildRecordCount += objWorkFlow.GetTechofferChildRecordCount(sPMDLDoc);
+                                        //    }
+                                        //}
+
+                                        ////objWorkFlow.UpdateRFQCount(nCount);
+                                        //objWorkFlow.UpdateTechOfferReceiveCount(nCount);
+
+                                        DataTable dtPMDLDoc1 = objWorkFlow.GetPMDLFromItemRef();
+                                        int nCount = 0;
+                                        string PMDL = "";
+                                        if (dtPMDLDoc1.Rows.Count > 0)
+                                        {
+
+                                            for (int i = 0; i < dtPMDLDoc1.Rows.Count; i++)
+                                            {
+
+                                                if (i == 0)
+                                                {
+                                                    PMDL = "'" + dtPMDLDoc1.Rows[0]["t_docn"].ToString() + "'";
+                                                }
+                                                else
+                                                {
+                                                    PMDL += ",'" + dtPMDLDoc1.Rows[i]["t_docn"].ToString() + "'";
+                                                }
+
+                                            }
+                                            nCount = objWorkFlow.GetTechofferChildRecordCount(PMDL);
+                                            //foreach (DataRow drow in dtPMDLDoc.Rows)
+                                            //{
+                                            //    string sPMDLDoc = drow["t_docn"].ToString();
+                                            //    nCount += objWorkFlow.GetEnquiryRaisedCount(sPMDLDoc);
+                                            //    //nTotalChildRecordCount += objWorkFlow.GetTotalChildRecordCount(sPMDLDoc);
+                                            //    //nTechofferChildRecordCount += objWorkFlow.GetTechofferChildRecordCount(sPMDLDoc);
+                                            //}
+                                        }
+                                       // objWorkFlow.UpdateTechOfferReceiveCount(nCount);
+                                    }
+
+
+                                }// change 14-09 foreach
+
                             }
+                            else
+                            {
+                                DetailSerialNoCount = objWorkFlow.GetDetailSerialNumber();
+                                DetailSerialNoCount++;
+                                objWorkFlow.DetailSerialCount = DetailSerialNoCount;
+                                // earlier all PMDL were saved in one colum comma seperated
+                                objWorkFlow.PMDLdocDesc = txtPMDLDoc.Text;
+                                DataTable dt = objWorkFlow.GetPartItemCount_Weight();
+                                if (dt.Rows.Count > 0)
+                                {
+                                    if (dt.Rows[0]["PartItemCount"].ToString() != "")
+                                    {
+                                        objWorkFlow.PartItemCount = (int)dt.Rows[0]["PartItemCount"];
+                                    }
+                                    else { objWorkFlow.PartItemCount = 0; }
+                                    if (dt.Rows[0]["PartItenWeight"].ToString() != "")
+                                    {
+                                        objWorkFlow.PartItemWeight = (double)dt.Rows[0]["PartItenWeight"];
+                                    }
+                                    else { objWorkFlow.PartItemWeight = 0; }
+                                }
+                                else
+                                {
+                                    objWorkFlow.PartItemCount = 0;
+                                    objWorkFlow.PartItemWeight = 0;
+                                }
+
+                                objWorkFlow.InsertPreOrderDatatoControlTowerChildTable();
+                                if (Request.QueryString["Status"] == "Enquiry Raised")
+                                {
+                                    // update t_rfqd in tdmisg140200 table
+                                    //change change -3,- 21-08-2018 
+                                    DataTable dataTable = objWorkFlow.GetRaisedEnquiryDate();
+                                    objWorkFlow.ItemReference = (string)dataTable.Rows[0]["t_iref"];
+                                    string Itemref_Typ = objWorkFlow.GetItemRefType();
+
+                                    if (dataTable.Rows[0]["RaisedDate"].ToString() == "01-01-1970" || dataTable.Rows[0]["RaisedDate"].ToString() == "01-01-1900")
+                                    {
+                                        string CurrentDate = DateTime.Now.ToString("yyyy-MM-dd");
+                                        objWorkFlow.UpdateRaisedEnquiryDate(CurrentDate);
+                                    }
+                                    DateTime MinRFQdate = objWorkFlow.GetMinRFQDate();
+                                    if (MinRFQdate != default(DateTime))
+                                    {
+                                        string MinRaisedEnquiryDate = MinRFQdate.ToString("yyyy-MM-dd hh:mm:ss");
+                                       // objWorkFlow.UpdateActualStartDate(MinRaisedEnquiryDate);
+                                    }
+                                    // update % field t_cpgv of table ttpisg220200 with (Drawings for which 
+                                    // raised Date is updated /No of Total drawings)* 100 
+                                    //against a particular pair of busisness handle and Item reference
+                                    // change -4
+
+                                    double percentageRaisedDrawingbyWeight = 0;
+                                    double percentageRaisedDrawing = 0;
+                                    double RFQraisedDrawingCount = objWorkFlow.GeRFQraisedDrawingCount();
+                                    double TotalDrawingCount = objWorkFlow.GeTotalDrawingCount();
+                                    if (TotalDrawingCount != 0)
+                                    {
+                                        percentageRaisedDrawing = Math.Round((RFQraisedDrawingCount / TotalDrawingCount), 4) * 100;
+                                    }
+
+                                    double RFQRaisedDrawingWeight = objWorkFlow.GetRFQRaisedDrawingWeight();
+                                    double TotalRaisedDrawingWeight = objWorkFlow.GetTotalDrawingWeight();
+                                    if (TotalRaisedDrawingWeight != 0)
+                                    {
+                                        percentageRaisedDrawingbyWeight = Math.Round((RFQRaisedDrawingWeight / TotalRaisedDrawingWeight), 4) * 100;
+                                    }
+
+
+                                    if (percentageRaisedDrawing < 100.00 && percentageRaisedDrawingbyWeight < 100.00)
+                                    {
+                                        if ((percentageRaisedDrawing >= percentageRaisedDrawingbyWeight))
+                                        {
+                                          //  objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawing);
+                                        }
+                                        else
+                                        {
+                                            if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
+                                            {
+                                                //objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawingbyWeight);
+                                            }
+                                            else
+                                            {
+                                               // objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawing);
+                                            }
+                                        }
+                                    }
+
+                                    else
+                                    {
+                                        if (percentageRaisedDrawing >= 100)
+                                        {
+                                          //  objWorkFlow.UpdateDrawingpercentage(100);
+                                        }
+                                        else
+                                        {
+                                           // objWorkFlow.UpdateDrawingpercentage(percentageRaisedDrawing);
+                                        }
+                                    }
+                                    // Update total number of count for which enquiry is sent to Vendor against each PMDL Doc
+                                    //First search the total number of count against Parent WFID for which child IDs are in 
+                                    //'Raised Enquiry' status then store this count  in t_numv of table tdmisg140200
+                                    // Change 2- 22/08/2018
+                                    //string parent_id = Request.QueryString["WFPID"];
+                                    //int nCount = objWorkFlow.GetEnquiryRaisedCount(parent_id);
+                                    //objWorkFlow.UpdateRFQCount(nCount);
+
+                                    DataTable dtPMDLDoc = objWorkFlow.GetPMDLFromItemRef();
+                                    int nCount = 0;
+                                    string PMDL = "";
+                                    if (dtPMDLDoc.Rows.Count > 0)
+                                    {
+
+                                        for (int i = 0; i < dtPMDLDoc.Rows.Count; i++)
+                                        {
+
+                                            if (i == 0)
+                                            {
+                                                PMDL = "'" + dtPMDLDoc.Rows[0]["t_docn"].ToString() + "'";
+                                            }
+                                            else
+                                            {
+                                                PMDL += ",'" + dtPMDLDoc.Rows[i]["t_docn"].ToString() + "'";
+                                            }
+
+                                        }
+                                        nCount = objWorkFlow.GetTotalChildRecordCount(PMDL);
+                                        //foreach (DataRow drow in dtPMDLDoc.Rows)
+                                        //{
+                                        //    string sPMDLDoc = drow["t_docn"].ToString();
+                                        //    nCount += objWorkFlow.GetEnquiryRaisedCount(sPMDLDoc);
+                                        //    //nTotalChildRecordCount += objWorkFlow.GetTotalChildRecordCount(sPMDLDoc);
+                                        //    //nTechofferChildRecordCount += objWorkFlow.GetTechofferChildRecordCount(sPMDLDoc);
+                                        //}
+                                    }
+                                   // objWorkFlow.UpdateRFQCount(nCount);
+                                }
+                                if (Request.QueryString["Status"] == "Technical offer Received")
+                                {
+                                    double nTotalChildRecordCount = 0;
+                                    double nTechofferChildRecordCount = 0;
+                                    double nOfferRecevied = 0;
+                                    double nTotalInquirySent = 0;
+                                    double nTotalWeight = 0;
+                                    double nTotalWeightForOfferReceieved = 0;
+                                    string PMDLDocs = "";
+                                    string PMDLDocuments = "";
+                                    string PMDLDocNo = "";
+                                    double percentageTechOfferReceivedDrawing_byDrawing = 0;
+                                    double percentageTechOfferReceivedDrawing_byWeight = 0;
+                                    DataTable dataTable1 = objWorkFlow.GetTechOfferReceiveDate();
+                                    objWorkFlow.ItemReference = (string)dataTable1.Rows[0]["t_iref"];
+                                    string Itemref_Typ = objWorkFlow.GetItemRefType();
+
+                                    if (dataTable1.Rows[0]["OfferReceiveDate"].ToString() == "01-01-1970" || dataTable1.Rows[0]["OfferReceiveDate"].ToString() == "01-01-1900")
+                                    {
+                                        string CurrentDate = DateTime.Now.ToString("yyyy-MM-dd");
+                                        objWorkFlow.UpdateOfferReceiveDate(CurrentDate);
+                                    }
+                                    DateTime MinOfferReceieveDate = objWorkFlow.GetMinOfferReceieveDate();
+                                    if (MinOfferReceieveDate != default(DateTime))
+                                    {
+                                        string OfferReceieveDate = MinOfferReceieveDate.ToString("yyyy-MM-dd hh:mm:ss");
+                                       // objWorkFlow.UpdateActualStartDate_tor(OfferReceieveDate);
+                                    }
+                                    string parent_id1 = Request.QueryString["WFPID"];
+                                    string sStatus=objWorkFlow.GetParenIDStatus(parent_id1);
+
+                                    if (sStatus== "All Offer Received")
+                                    {
+                                        percentageTechOfferReceivedDrawing_byDrawing = 100;
+                                    }
+                                    else
+                                    {
+                                        DataTable dtPMDLDoc = objWorkFlow.GetPMDLFromItemRef();
+                                        //if (dtPMDLDoc.Rows.Count > 0)
+                                        //{
+
+                                        //    foreach (DataRow drow in dtPMDL.Rows)
+                                        //    {
+                                        //        string sPMDLDoc = drow["t_docn"].ToString();
+                                        //        nTotalChildRecordCount += objWorkFlow.GetTotalChildRecordCount(sPMDLDoc);
+                                        //        nTechofferChildRecordCount += objWorkFlow.GetTechofferChildRecordCount(sPMDLDoc);
+                                        //    }
+                                        //}
+                                        if (dtPMDLDoc.Rows.Count > 0)
+                                        {
+
+                                            for (int i = 0; i < dtPMDLDoc.Rows.Count; i++)
+                                            {
+
+                                                if (i == 0)
+                                                {
+                                                    PMDLDocs = "'" + dtPMDLDoc.Rows[0]["t_docn"].ToString() + "'";
+                                                }
+                                                else
+                                                {
+                                                    PMDLDocs += ",'" + dtPMDLDoc.Rows[i]["t_docn"].ToString() + "'";
+                                                }
+
+                                            }
+                                        }
+                                        DataTable dtPMDLDocForOfferReceieved = objWorkFlow.GetPMDLFromItemRefForOfferReceived();
+                                        if (dtPMDLDocForOfferReceieved.Rows.Count > 0)
+                                        {
+
+                                            for (int i = 0; i < dtPMDLDocForOfferReceieved.Rows.Count; i++)
+                                            {
+
+                                                if (i == 0)
+                                                {
+                                                    PMDLDocuments = "'" + dtPMDLDocForOfferReceieved.Rows[0]["t_docn"].ToString() + "'";
+                                                }
+                                                else
+                                                {
+                                                    PMDLDocuments += ",'" + dtPMDLDocForOfferReceieved.Rows[i]["t_docn"].ToString() + "'";
+                                                }
+
+                                            }
+                                        }
+                                        DataTable dtPMDLbyWFID = objWorkFlow.GetPMDLbyWFID();
+                                        if (dtPMDLbyWFID.Rows.Count > 0)
+                                        {
+
+                                            for (int i = 0; i < dtPMDLbyWFID.Rows.Count; i++)
+                                            {
+
+                                                if (i == 0)
+                                                {
+                                                    PMDLDocNo = "'" + dtPMDLbyWFID.Rows[0]["PMDLDocNo"].ToString() + "'";
+                                                }
+                                                else
+                                                {
+                                                    PMDLDocNo += ",'" + dtPMDLbyWFID.Rows[i]["PMDLDocNo"].ToString() + "'";
+                                                }
+
+                                            }
+                                        }
+
+                                        nTotalChildRecordCount += objWorkFlow.GetTotalChildRecordCount(PMDLDocs);
+                                        nTechofferChildRecordCount += objWorkFlow.GetTechofferChildRecordCount(PMDLDocs);
+                                        // nTotalWeight += objWorkFlow.GetTotalWeight(PMDLDocs);
+                                        nTotalWeight += objWorkFlow.GetTotalWeight();
+                                        nTotalWeightForOfferReceieved += objWorkFlow.GetTotalWeight(PMDLDocuments);
+                                        //  double EnquiryRaisedpercentage = objWorkFlow.GeRFQraisedDrawingpercentage();
+                                        nTotalInquirySent = objWorkFlow.GetTotalInquirySentCount();
+                                        nOfferRecevied = objWorkFlow.GeTechOfferReceievedDrawingCount(PMDLDocNo);
+
+                                        if (nTotalChildRecordCount != 0 && nTotalInquirySent != 0)
+                                        {
+                                            percentageTechOfferReceivedDrawing_byDrawing = Math.Round((nTechofferChildRecordCount / nTotalChildRecordCount) * (nOfferRecevied / nTotalInquirySent) * 100, 2);
+                                        }
+                                        else
+                                        {
+                                            percentageTechOfferReceivedDrawing_byDrawing = 0;
+                                        }
+
+                                        if (nTotalChildRecordCount != 0 && nTotalWeight != 0)
+                                        {
+                                            percentageTechOfferReceivedDrawing_byWeight = Math.Round((nTechofferChildRecordCount / nTotalChildRecordCount) * (nTotalWeightForOfferReceieved / nTotalWeight) * 100, 2);
+                                        }
+                                        else
+                                        {
+                                            percentageTechOfferReceivedDrawing_byWeight = 0;
+                                        }
+                                    }
+                                    string parent_id2 = Request.QueryString["WFPID"];
+                                    objWorkFlow.Parent_WFID = Convert.ToInt32(parent_id2);
+                                    objWorkFlow.InsertIntoItemReferencewiseProgressTable(percentageTechOfferReceivedDrawing_byWeight, percentageTechOfferReceivedDrawing_byDrawing);
+                                    //DataTable dtPercentage = objWorkFlow.GetTechnoComNegotiationPercentagebyCount_Weight();
+                                    DataTable dtPercentage = objWorkFlow.GetPercentagebyCount_Weight();
+                                    double percentage_byCount = 0;
+                                    double percentage_byWeight = 0;
+
+                                    if (dtPercentage.Rows.Count > 0)
+                                    {
+                                        foreach (DataRow dr in dtPercentage.Rows)
+                                        {
+                                            objWorkFlow.Project = dr["Project"].ToString();
+                                            objWorkFlow.ItemReference = dr["ItemReference"].ToString();
+                                            //double percentage_byCount = Convert.ToDouble(dr["CountPercentage"]);
+                                            //double percentage_byWeight = Convert.ToDouble(dr["WeightPercentage"]);
+                                            percentage_byCount += Convert.ToDouble(dr["CountPercentage"]);
+                                            percentage_byWeight += Convert.ToDouble(dr["WeightPercentage"]);
+                                        }
+                                    }
+
+
+
+                                            if (percentage_byCount < 100.00 && percentage_byWeight < 100.00)
+                                            {
+                                                if ((percentage_byCount >= percentage_byWeight))
+                                                {
+                                                  //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                                }
+                                                else
+                                                {
+                                                    if (Itemref_Typ == "4")// when item reference typ=="Self Engineered" then only update with weight %
+                                                    {
+                                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight);
+                                                    }
+                                                    else
+                                                    {
+                                                      //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                                    }
+                                                }
+                                            }
+
+                                            else
+                                            {
+                                                if (percentage_byCount >= 100)
+                                                {
+                                                  //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
+                                                }
+                                                else
+                                                {
+                                                 //   objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                                                }
+                                            }
+                                    //    }
+                                    //}
+                                    //double RFQraisedDrawingCount = objWorkFlow.GeRFQraisedDrawingCount();
+                                    //double TotalDrawingCount = objWorkFlow.GeTotalDrawingCount();
+                                    //double EnquiryRaisedpercentage = objWorkFlow.GeRFQraisedDrawingpercentage();
+                                    //double percentageTechOfferReceivedDrawing = Math.Round((RFQraisedDrawingCount / TotalDrawingCount) * EnquiryRaisedpercentage, 3);
+                                    //objWorkFlow.UpdateDrawingpercentage(percentageTechOfferReceivedDrawing);
+                                    //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentageTechOfferReceivedDrawing);
+
+
+                                    //string parent_id = Request.QueryString["WFPID"];
+                                    //int nCount = objWorkFlow.GetTechOfferReceiveDateCount(parent_id);
+                                    //objWorkFlow.UpdateTechOfferReceiveCount(nCount);
+                                    DataTable dtPMDLDoc1 = objWorkFlow.GetPMDLFromItemRef();
+                                    int nCount = 0;
+                                    string PMDL = "";
+                                    if (dtPMDLDoc1.Rows.Count > 0)
+                                    {
+
+                                        for (int i = 0; i < dtPMDLDoc1.Rows.Count; i++)
+                                        {
+
+                                            if (i == 0)
+                                            {
+                                                PMDL = "'"+dtPMDLDoc1.Rows[0]["t_docn"].ToString()+"'";
+                                            }
+                                            else
+                                            {
+                                                PMDL += ",'" + dtPMDLDoc1.Rows[i]["t_docn"].ToString() + "'";
+                                            }
+
+                                        }
+                                        nCount = objWorkFlow.GetTechofferChildRecordCount(PMDL);
+                                        //foreach (DataRow drow in dtPMDLDoc.Rows)
+                                        //{
+                                        //    string sPMDLDoc = drow["t_docn"].ToString();
+                                        //    nCount += objWorkFlow.GetEnquiryRaisedCount(sPMDLDoc);
+                                        //    //nTotalChildRecordCount += objWorkFlow.GetTotalChildRecordCount(sPMDLDoc);
+                                        //    //nTechofferChildRecordCount += objWorkFlow.GetTechofferChildRecordCount(sPMDLDoc);
+                                        //}
+                                    }
+                                    //objWorkFlow.UpdateTechOfferReceiveCount(nCount);
+                                }
+
+                                }
                         }
                     }
+                    else
+                    {
+                    }
+                    //if (Request.QueryString["Status"] == "Enquiry Raised")
+                    //{
+
+                    //    // update t_acsd in table ttpisg220200 with the Min of t_rfqd for the given item ref and t_bohd
+
+                    //    DateTime MinRFQdate = objWorkFlow.GetMinRFQDate();
+                    //    if (MinRFQdate != default(DateTime))
+                    //    {
+                    //        string MinRaisedEnquiryDate = MinRFQdate.ToString("yyyy-MM-dd hh:mm:ss");
+                    //        objWorkFlow.UpdateActualStartDate(MinRaisedEnquiryDate);
+                    //    }
+                    //}
+                    //if (Request.QueryString["Status"] == "Technical offer Received")
+                    //{
+
+                    //    // update t_acsd in table ttpisg220200 with the Min of t_rfqd for the given item ref and t_bohd
+
+                    //    DateTime MinOfferReceieveDate = objWorkFlow.GetMinOfferReceieveDate();
+                    //    if (MinOfferReceieveDate != default(DateTime))
+                    //    {
+                    //        string OfferReceieveDate = MinOfferReceieveDate.ToString("yyyy-MM-dd hh:mm:ss");
+                    //        objWorkFlow.UpdateActualStartDate_tor(OfferReceieveDate);
+                    //    }
+                    //}
+                    #endregion
+
+
+
 
                     if (Request.QueryString["Status"] == "Enquiry Raised")
                     {
@@ -350,10 +1144,10 @@ namespace PreOrderWorkflow
                     //{
                     //    Response.Redirect("TechnoCommercialNegotiaition.aspx?u=" + Request.QueryString["u"] + "&WFID=" + Request.QueryString["WFID"]);
                     //}
-                    if (Request.QueryString["Status"] == "Commercial offer Received")
-                    {
-                        Response.Redirect("RaisedEnquiry.aspx?u=" + Request.QueryString["u"] + "&WFPID=" + Request.QueryString["WFPID"]);
-                    }
+                    //if (Request.QueryString["Status"] == "Commercial offer Received")
+                    //{
+                    //    Response.Redirect("RaisedEnquiry.aspx?u=" + Request.QueryString["u"] + "&WFPID=" + Request.QueryString["WFPID"]);
+                    //}
 
                     if (Request.QueryString["Status"] == "Isgec Comment Submitted")
                     {
@@ -361,10 +1155,10 @@ namespace PreOrderWorkflow
                     }
                     // ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert('" + Request.QueryString["Status"] + "');", true);
                 }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert('Please Fill All information');", true);
-                }
+            }
+            else
+            {
+                ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert('Please Fill All information');", true);
             }
 
             //
@@ -381,14 +1175,14 @@ namespace PreOrderWorkflow
             objWorkFlow.SpecificationNo = dt.Rows[0]["SpecificationNo"].ToString();
             objWorkFlow.Buyer = dt.Rows[0]["Buyer"].ToString();
             objWorkFlow.UserId = Request.QueryString["u"];
-            objWorkFlow.PMDLdocDesc = dt.Rows[0]["PMDLDocNo"].ToString();
+            objWorkFlow.PMDLdocDesc= dt.Rows[0]["PMDLDocNo"].ToString();
             objWorkFlow.WF_Status = status;
             objWorkFlow.Supplier = dt.Rows[0]["Supplier"].ToString();
             objWorkFlow.SupplierName = dt.Rows[0]["SupplierName"].ToString();
-            objWorkFlow.Manager = dt.Rows[0]["Manager"].ToString();
+            objWorkFlow.Manager= dt.Rows[0]["Manager"].ToString();
             objWorkFlow.Notes = txtNotes.Text;
             DataTable dtWFHID = objWorkFlow.InserPreOrderHistory();
-            // objWorkFlow.InserPreOrderHistoryToBAAN(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
+            objWorkFlow.InserPreOrderHistoryToBAAN(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
             string IndexValue = dtWFHID.Rows[0][0].ToString() + "_" + dtWFHID.Rows[0][1].ToString();
             return IndexValue;
         }
@@ -498,7 +1292,7 @@ namespace PreOrderWorkflow
                 mM.To.Add(MailTo); //MailTo
                 mM.To.Add(UserMailId);
                 mM.Subject = EmailSub;
-                //Request.QueryString["Status"] + "-" + txtSpecification.Text;
+                    //Request.QueryString["Status"] + "-" + txtSpecification.Text;
                 //foreach (HttpPostedFile PostedFile in fileAttachment.PostedFiles)
                 //{
                 //    string fileName = Path.GetFileName(PostedFile.FileName);
@@ -660,11 +1454,9 @@ namespace PreOrderWorkflow
         {
             if (Request.QueryString["Status"] == "Technical offer Received")
             {
-                Response.Redirect("GeneratePreOrderReceipt.aspx?u=" + Request.QueryString["u"] + "&WFID=" + Request.QueryString["WFID"] + "&WFPID=" + hdfParentWFID.Value);
+                Response.Redirect("GeneratePreOrderReceipt.aspx?u=" + Request.QueryString["u"] + "&WFID=" + Request.QueryString["WFID"] + "&WFPID="+ hdfParentWFID.Value);
             }
 
         }
     }
-
 }
-#endregion

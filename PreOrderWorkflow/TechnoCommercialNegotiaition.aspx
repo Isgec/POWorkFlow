@@ -156,8 +156,12 @@
                 <div class="form-group">
                     <label class="auto-style2"></label>
                     <div class="auto-style1">
+                         <div="col-sm-10">
                         <asp:Button runat="server" ID="btnEnqTechCom" Text="Techno Commercial Negotiation For Enquiry Completed" CssClass="btn btn-sm btn-primary" Height="33px" OnClick="btnSendEnquiry_Click" />
-                         
+                         <div />
+                    </div>
+                    <div="col-sm-2">
+                        <asp:Button runat="server" ID="btnIdmsReceipt" Text="IDMS Receipt" CssClass="btn btn-sm btn-primary" Height="33px" Visible="true" OnClick="btnIdmsReceipt_Click" />
                     </div>
                 </div>
             </div>

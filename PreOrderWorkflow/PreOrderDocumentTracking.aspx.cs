@@ -39,35 +39,25 @@ namespace PreOrderWorkflow
         /// </summary>
         private void GetData()
         {
-            try
+            objWorkFlow = new WorkFlow();
+            objWorkFlow.UserId = Request.QueryString["u"];
+            DataTable dtAllReceiptStatus = new DataTable();
+            DataTable dt = objWorkFlow.GetPreOrderDocumentTracking();
+            foreach (DataRow dr in dt.Rows)
             {
-                objWorkFlow = new WorkFlow();
-                objWorkFlow.UserId = Request.QueryString["u"];
-                DataTable dtAllReceiptStatus = new DataTable();
-                DataTable dt = objWorkFlow.GetPreOrderDocumentTracking();
-                foreach (DataRow dr in dt.Rows)
+                if (dr["ReceiptNo"].ToString() != null && dr["ReceiptNo"].ToString() != "")
                 {
-                   if (dr["ReceiptNo"].ToString() != null)
-                        {
-                            if (dr["ReceiptNo"].ToString() != "")
-                            {
-                                string sReceiptNumber = dr["ReceiptNo"].ToString();
-                                string ReceiptStatus = objWorkFlow.GetReceiptStatus(sReceiptNumber);
-                                dr["ReceiptStatus"] = ReceiptStatus;
-                            }
-                        }
+                    string sReceiptNumber = dr["ReceiptNo"].ToString();
+                   string ReceiptStatus = objWorkFlow.GetReceiptStatus(sReceiptNumber);
+                    dr["ReceiptStatus"] = ReceiptStatus;
                 }
+            }
+         
+            gvData.DataSource = dt;
+            gvData.RowDataBound += new GridViewRowEventHandler(gvData_RowDataBound);
+            gvData.DataBind();
+            gvData.Columns[3].ItemStyle.Width = 500;
 
-                gvData.DataSource = dt;
-                gvData.RowDataBound += new GridViewRowEventHandler(gvData_RowDataBound);
-                gvData.DataBind();
-                gvData.Columns[3].ItemStyle.Width = 500;
-            }
-            catch (Exception ex)
-            {
-                string sErrormsg=ex.Message;
-                ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert('Some technical issue');", true);
-            }
             //  gvData.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
 
         }

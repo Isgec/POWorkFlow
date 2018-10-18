@@ -64,14 +64,13 @@ namespace PreOrderWorkflow
                         //and t_hndl = 'J_PREORDER_WORKFLOW'
                         SqlConnection conLive = new SqlConnection(csLive);
                         string sNoteToAttach = @"select * from ttcisg132200 where t_indx='"+ sNotes + "'";
-                        ////SqlCommand cmd = new SqlCommand(sNoteToAttach, con);
+                        //SqlCommand cmd = new SqlCommand(sNoteToAttach, con);
                         // cmd.CommandType = CommandType.Text;
                         //string dResult = cmd.ExecuteDataset().ToString();
                         string revision ="_"+Request.QueryString["Revision"]+"_1";
                         DataTable dt= Microsoft.ApplicationBlocks.Data.SqlHelper.ExecuteDataset(conLive, CommandType.Text, sNoteToAttach).Tables[0];
                         if (dt.Rows.Count > 0)
                         {
-                          
                             string sDocumentId = dt.Rows[0]["t_dcid"].ToString();
                             string sFileName = dt.Rows[0]["t_fnam"].ToString();
                             string sLibCode = dt.Rows[0]["t_lbcd"].ToString();
@@ -82,7 +81,7 @@ namespace PreOrderWorkflow
 
                             //string sCount = @"select MAX(CONVERT(int,t_drid)) from ttcisg132200";
                             nRecord = new Random(Guid.NewGuid().GetHashCode()).Next();
-                            //string sDocumentId = "AAA" + nRecord;
+                           // string sDocumentId = "AAA" + nRecord;
                            // string sCount = @"SELECT (ISNULL(MAX(t_rnum),0) + 1)as RunningNo FROM ttcisg131200 where t_acti='Y'";
                             //string count =(Microsoft.ApplicationBlocks.Data.SqlHelper.ExecuteScalar(conLive, CommandType.Text, sCount)).ToString();
                             //nRecord = Convert.ToInt32(count);
@@ -118,8 +117,7 @@ namespace PreOrderWorkflow
             Session["item"] = Request.QueryString["Item"];
             Session["IndentNo"] = Request.QueryString["Indent"];
             // Response.Redirect(Request.UrlReferrer.ToString()); //To redirect to previous page Request.QueryString["Index"]
-            string sRedirect = "GeneratePreOrderReceipt.aspx?u=" + Request.QueryString["AttachedBy"] + "&WFID=" + Request.QueryString["Index"] + "";
-            Response.Redirect(sRedirect);
+            Response.Redirect("GeneratePreOrderReceipt.aspx?u=" + Request.QueryString["AttachedBy"] + "&WFID=" + Request.QueryString["Index"] + "&WFPID=" + Request.QueryString["WFPID"] + "");
         }
     }
 }

@@ -93,9 +93,7 @@
                            <%-- <div class="col-sm-4">
                                 <asp:Label runat="server" ID="lblPMDLdoc"></asp:Label></div>--%>
                             <div class="col-sm-6">
-                                <asp:ListBox runat="server" ID="ddlPMDL" SelectionMode="Multiple" Height="100" Width="100%" style="height:120" 
-                                     AppendDataBoundItems="true"
-                                    />
+                                <asp:ListBox runat="server" ID="ddlPMDL" SelectionMode="Multiple" Height="100" Width="100%" style="height:120"/>
                             </div>
                             <div class="col-sm-4">
                                 <asp:Label runat="server" ID="lblPMDL"></asp:Label>

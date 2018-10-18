@@ -417,12 +417,14 @@ namespace PreOrderWorkflow
                             if (sPMDLDocNumber.Contains(","))
                             {
                                 objWorkFlow.PMDLdocDesc = sPMDLDocNumber.Substring(0, sPMDLDocNumber.Length - 3);
+                                objWorkFlow.PMDLdocDesc = objWorkFlow.PMDLdocDesc.Replace("'","");
+
                             }
                             else
                             {
                                 objWorkFlow.PMDLdocDesc = sPMDLDocNumber.ToString();
                             }
-                            // objWorkFlow.PMDLdocDesc=String.Join("','", objWorkFlow.PMDLdocDesc);
+                           // objWorkFlow.PMDLdocDesc=String.Join("','", objWorkFlow.PMDLdocDesc);
                         }
                         objWorkFlow.Buyer = ddlBuyer.SelectedValue;
                         objWorkFlow.Manager = ddlManager.SelectedValue;
@@ -437,7 +439,7 @@ namespace PreOrderWorkflow
                         objWorkFlow.Project = objWorkFlow.Project.Substring(0, 6);
                         objWorkFlow.Element = objWorkFlow.Element.Substring(0, 8);
                         // Write a function to insert record in dmisg168 
-                       // objWorkFlow.InsertPreorderDataToBAN(sWFID);
+                        objWorkFlow.InsertPreorderDataToBAN(sWFID);
                         objWorkFlow.Project = ddlProject.SelectedValue + "-" + lblProjectName.Text;
                         objWorkFlow.Element = ddlElement.SelectedValue + "-" + lblProjectElementName.Text;
                         hdfWFID.Value = dtres.Rows[0][0].ToString();
@@ -450,7 +452,7 @@ namespace PreOrderWorkflow
                             string sPMDLDocNo = "";
                             objWorkFlow.Notes = txtNotes.Text;
                             DataTable dtWFHID = objWorkFlow.InserPreOrderHistory();
-                          //  objWorkFlow.InserPreOrderHistoryToBAAN(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
+                            objWorkFlow.InserPreOrderHistoryToBAAN(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
                             string IndexValue = dtWFHID.Rows[0][0].ToString() + "_" + dtWFHID.Rows[0][1].ToString();
                             hdfHistoryID.Value = dtWFHID.Rows[0][1].ToString();
                             //  divAlert.Visible = true;
@@ -719,7 +721,7 @@ namespace PreOrderWorkflow
                     objWorkFlow.UserId = Request.QueryString["u"];
                     objWorkFlow.WF_Status = "Technical Specification Released";
 
-                    if (btnSave.Text == "Release" && Request.QueryString["WFID"]==null)
+                    if (btnSave.Text == "Release" && Request.QueryString["WFID"] == null)
                     {
                         //if (ddlPMDL.Items.Count > 0)
                         //{
@@ -744,6 +746,7 @@ namespace PreOrderWorkflow
                             if (sPMDLDocNumber.Contains(","))
                             {
                                 objWorkFlow.PMDLdocDesc = sPMDLDocNumber.Substring(0, sPMDLDocNumber.Length - 1);
+                                objWorkFlow.PMDLdocDesc = objWorkFlow.PMDLdocDesc.Replace("'", "");
                             }
                             else
                             {
@@ -755,8 +758,11 @@ namespace PreOrderWorkflow
                         {
                             objWorkFlow.PMDLdocDesc = "";
                         }
-                        //DataTable dtres = objWorkFlow.InsertPreOrderData();
+                      //  DataTable dtres = objWorkFlow.InsertPreOrderData();
                         // Dump Data into BAAN table Change-25-08-2018 sagar
+
+                        // int sWFID = objWorkFlow.GetWorkFlowID();   // Commented during migration of Control Tower code on Production
+
                         int sWFID = 0;
                         if (Session["WFID"] != null)
                         {
@@ -764,18 +770,17 @@ namespace PreOrderWorkflow
                         }
                         else
                         {
-                          //  sWFID = objWorkFlow.GetWorkFlowID();
+                            //  sWFID = objWorkFlow.GetWorkFlowID();
                         }
 
 
                         objWorkFlow.Project = objWorkFlow.Project.Substring(0, 6);
                         objWorkFlow.Element = objWorkFlow.Element.Substring(0, 8);
-                        // Write a function to insert record in dmisg168 
-                        //  objWorkFlow.InsertPreorderDataToBAN(sWFID);
                         int res1 = 0;
                         if (Session["WFID"] != null)
                         {
                             res1 = objWorkFlow.UpdateWF_Status();
+                            int res2 = objWorkFlow.UpdateWF_StatusInBAANTable();
                         }
                         else
                         {
@@ -785,14 +790,17 @@ namespace PreOrderWorkflow
                             objWorkFlow.WF_Status = "Technical Specification Released";
 
                             DataTable dtres = objWorkFlow.InsertPreOrderData();
+                            // Write a function to insert record in dmisg168 
+                            objWorkFlow.InsertPreorderDataToBAN(sWFID);
                             objWorkFlow.WFID = objWorkFlow.GetWorkFlowID();
                             res1 = objWorkFlow.UpdateWF_Status();
+                            int res2 = objWorkFlow.UpdateWF_StatusInBAANTable();
                         }
                         if (res1 > 0)
                         {
                             InsertPreHistory(objWorkFlow.WFID, "Technical Specification Released");
                         }
-                            objWorkFlow.Project = ddlProject.SelectedValue + "-" + lblProjectName.Text;
+                        objWorkFlow.Project = ddlProject.SelectedValue + "-" + lblProjectName.Text;
                         objWorkFlow.Element = ddlElement.SelectedValue + "-" + lblProjectElementName.Text;
                         // if (dtres.Rows.Count > 0)
                         if (res1 > 0)
@@ -810,25 +818,49 @@ namespace PreOrderWorkflow
                                     {
                                         objWorkFlow.MultiPMDLdocDesc = ddlPMDL.Items[i].Value.ToString();
                                         objWorkFlow.InsertMultiPMDL();
-                                       // objWorkFlow.InsertMultiPMDLtoDuplicateTable();
+                                        // objWorkFlow.InsertMultiPMDLtoDuplicateTable();
                                     }
                                 }
                             }
                             else
                             {
-                              
-                            }
-                            //objWorkFlow.Supplier = "";
-                            //objWorkFlow.SupplierName = "";
-                            //objWorkFlow.Notes = txtNotes.Text;
-                            //DataTable dtWFHID = objWorkFlow.InserPreOrderHistory();
-                            //objWorkFlow.Project = objWorkFlow.Project.Substring(0, 6);
-                            //objWorkFlow.Element = objWorkFlow.Element.Substring(0, 8);
-                            //objWorkFlow.InserPreOrderHistoryToBAAN(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
-                            //string IndexValue = dtWFHID.Rows[0][0].ToString() + "_" + dtWFHID.Rows[0][1].ToString();
 
-                            //divAlert.Visible = true;
-                            //Response.Redirect("ReleaseTechnicalSpecification.aspx?u=" + Request.QueryString["u"]);
+                            }
+                            // Write a function to insert record in dmisg168 
+                            //objWorkFlow.InsertPreorderDataToBAN(sWFID);
+                            //objWorkFlow.Project = ddlProject.SelectedValue + "-" + lblProjectName.Text;
+                            //objWorkFlow.Element = ddlElement.SelectedValue + "-" + lblProjectElementName.Text;
+                            //if (dtres.Rows.Count > 0)
+                            //{
+                            //    //Insert In History
+                            //    objWorkFlow.WFID = Convert.ToInt32(dtres.Rows[0][0]);
+                            //    if (ddlPMDL.Items.Count > 0)
+                            //    {
+                            //        for (int i = 0; i < ddlPMDL.Items.Count; i++)
+                            //        {
+                            //            if (ddlPMDL.Items[i].Selected)
+                            //            {
+                            //                objWorkFlow.MultiPMDLdocDesc = ddlPMDL.Items[i].Value.ToString();
+                            //                objWorkFlow.InsertMultiPMDL();
+                            //                objWorkFlow.InsertMultiPMDLtoDuplicateTable();
+                            //            }
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+
+                            //    }
+                            //    objWorkFlow.Supplier = "";
+                            //    objWorkFlow.SupplierName = "";
+                            //    objWorkFlow.Notes = txtNotes.Text;
+                            //    DataTable dtWFHID = objWorkFlow.InserPreOrderHistory();
+                            //    objWorkFlow.Project = objWorkFlow.Project.Substring(0, 6);
+                            //    objWorkFlow.Element = objWorkFlow.Element.Substring(0, 8);
+                            //    objWorkFlow.InserPreOrderHistoryToBAAN(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
+                            //    string IndexValue = dtWFHID.Rows[0][0].ToString() + "_" + dtWFHID.Rows[0][1].ToString();
+
+                            //    divAlert.Visible = true;
+                            //    //Response.Redirect("ReleaseTechnicalSpecification.aspx?u=" + Request.QueryString["u"]);
                         }
                     }
                     if (btnSave.Text == "Release" && Request.QueryString["WFID"] != null)
@@ -839,17 +871,17 @@ namespace PreOrderWorkflow
                         objWorkFlow.SLNO_WFID = Convert.ToInt32(dtSlHistory.Rows[0][0]);
                         objWorkFlow.WF_Status = "Technical Specification Released";
                         objWorkFlow.UpdateWF_Status();
-                     //   objWorkFlow.UpdateWF_StatusInBAANTable(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
+                        objWorkFlow.UpdateWF_StatusInBAANTable(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
                         objWorkFlow.UpdateStatusWFPreOrder_History();
-                      //  objWorkFlow.UpdateStatusWFPreOrder_HistoryBaaN();
+                        objWorkFlow.UpdateStatusWFPreOrder_HistoryBaaN();
                         // Response.Redirect("ReleaseTechnicalSpecification.aspx?u=" + Request.QueryString["u"]);
                     }
                     if (btnSave.Text == "ReSubmit")
                     {
-                       // objWorkFlow = new WorkFlow();
-                        objWorkFlow.WFID = Convert.ToInt32(Request.QueryString["WFID"]);                     
+                        // objWorkFlow = new WorkFlow();
+                        objWorkFlow.WFID = Convert.ToInt32(Request.QueryString["WFID"]);
                         int res = objWorkFlow.UpdateWFPreOrder();
-                      //  objWorkFlow.UpdateWF_StatusInBAANTable(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar 
+                        objWorkFlow.UpdateWF_StatusInBAANTable(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar 
                         if (res > 0)
                         {
                             // DataTable dtWFHID = objWorkFlow.GetWFHID(Convert.ToInt32(Request.QueryString["WFID"]));
@@ -872,7 +904,7 @@ namespace PreOrderWorkflow
                     DataTable dtManager = objWorkFlow.GetMAilID(ddlManager.SelectedValue);
                     string BuyerMail = dtBuyer.Rows[0]["EMailid"].ToString();
                     string ManagerMail = dtManager.Rows[0]["EMailid"].ToString();
-                    string MailTo = BuyerMail+","+ ManagerMail;
+                    string MailTo = BuyerMail + "," + ManagerMail;
                     SendMail(MailTo);
 
                     Response.Redirect("ReleaseTechnicalSpecification.aspx?u=" + Request.QueryString["u"]);
@@ -897,18 +929,17 @@ namespace PreOrderWorkflow
             objWorkFlow.Element = dt.Rows[0]["Element"].ToString();
             objWorkFlow.PMDLdocDesc = dt.Rows[0]["PMDLDocNo"].ToString();
             objWorkFlow.Buyer = dt.Rows[0]["Buyer"].ToString();
-            objWorkFlow.Buyer = dt.Rows[0]["Manager"].ToString();
+            objWorkFlow.Manager = dt.Rows[0]["Manager"].ToString();
             objWorkFlow.UserId = Request.QueryString["u"];
             objWorkFlow.WF_Status = status;
             objWorkFlow.Supplier = dt.Rows[0]["Supplier"].ToString();
             objWorkFlow.SupplierName = dt.Rows[0]["SupplierName"].ToString();
-            objWorkFlow.Notes = txtNotes.Text;
             objWorkFlow.SpecificationNo = dt.Rows[0]["SpecificationNo"].ToString();
+            objWorkFlow.Notes = txtNotes.Text;
             DataTable dtWFHID = objWorkFlow.InserPreOrderHistory();
             objWorkFlow.Project = objWorkFlow.Project.Substring(0, 6);
             objWorkFlow.Element = objWorkFlow.Element.Substring(0, 8);
-           
-            //  objWorkFlow.InserPreOrderHistoryToBAAN(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
+            objWorkFlow.InserPreOrderHistoryToBAAN(); // Dump Preorder Data TO BAAN table change 25/08/2018 sagar
             string IndexValue = dtWFHID.Rows[0][0].ToString() + "_" + dtWFHID.Rows[0][1].ToString();
             return IndexValue;
         }
@@ -1082,6 +1113,7 @@ namespace PreOrderWorkflow
             {
                 objWorkFlow.PMDLdocDesc = "";
             }
+
             //  objectWorkFlow.PMDLdocDesc = ddlPMDL.SelectedValue;
             string sTransaction = "";
             DataTable dtRefIndex = objectWorkFlow.GetIndex();

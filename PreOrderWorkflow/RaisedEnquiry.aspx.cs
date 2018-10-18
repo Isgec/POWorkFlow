@@ -47,8 +47,7 @@ namespace PreOrderWorkflow
             }
             if (values[2] == "Technical offer Received")
             {
-              //  Response.Redirect("RaiseEnquiryForm.aspx?WFID=" + objWorkFlow.WFID + "&Status=Enquiry For Techno Commercial Negotiation Completed&u=" + Request.QueryString["u"] + "&WFPID=" + values[1]);
-                Response.Redirect("RaiseEnquiryForm.aspx?WFID=" + objWorkFlow.WFID + "&Status=Commercial offer Received&u=" + Request.QueryString["u"] + "&WFPID=" + values[1]);
+                Response.Redirect("RaiseEnquiryForm.aspx?WFID=" + objWorkFlow.WFID + "&Status=Enquiry For Techno Commercial Negotiation Completed&u=" + Request.QueryString["u"] + "&WFPID=" + values[1]);
             }
             if (values[2] == "Enquiry For Techno Commercial Negotiation Completed")
             {
