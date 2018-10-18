@@ -22,11 +22,12 @@
             position: relative;
             min-height: 1px;
             float: left;
-            width: 16.66666667%;
-            left: -16px;
-            top: 2px;
+            width: 61%;
+            left: -140px;
+            top: -55px;
             padding-left: 15px;
             padding-right: 15px;
+            height: 129px;
         }
         .auto-style2 {
             position: relative;
@@ -37,6 +38,20 @@
             top: 24px;
             padding-left: 15px;
             padding-right: 15px;
+        }
+        .auto-style3 {
+            position: relative;
+            min-height: 1px;
+            float: left;
+            width: 83.33333333%;
+            left: -27px;
+            top: 7px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        .auto-style4 {
+            height: 99px;
+            width: 472px;
         }
     </style>
    <%-- <script type="text/javascript">
@@ -61,7 +76,7 @@
       <div class="mb" runat="server" id="hHeader" style="text-align:center;font-size:16px;font-weight:bold"><i class="fa fa-angle-right"></i></div>
     <asp:HiddenField  runat="server" ID="hdfBuyerId"/> <asp:HiddenField  runat="server" ID="hdfRandomNo"/><asp:HiddenField  runat="server" ID="hdfParentWFID"/>
     <asp:Label runat="server" ID="lblWorkFlowID" />
-    <div class="col-lg-10">
+    <div class="auto-style3">
         <div class="form-panel">
             <div class="row mt">
                 <div class="form-group">
@@ -149,6 +164,8 @@
                     <label class="col-sm-3"></label>
                     <div class="col-sm-8">
                     </div>
+                    <br />
+                    <br />
                 </div>
             </div>
 
@@ -157,11 +174,14 @@
                     <label class="auto-style2"></label>
                     <div class="auto-style1">
                          <div="col-sm-10">
+                         <div class="auto-style4" />
+                        <asp:Button runat="server" ID="btnIdmsReceipt" Text="IDMS Receipt" CssClass="btn btn-sm btn-primary" Height="33px" Visible="true" OnClick="btnIdmsReceipt_Click" />
+                             <br />
+                             <br />
+                             <br />
                         <asp:Button runat="server" ID="btnEnqTechCom" Text="Techno Commercial Negotiation For Enquiry Completed" CssClass="btn btn-sm btn-primary" Height="33px" OnClick="btnSendEnquiry_Click" />
-                         <div />
                     </div>
                     <div="col-sm-2">
-                        <asp:Button runat="server" ID="btnIdmsReceipt" Text="IDMS Receipt" CssClass="btn btn-sm btn-primary" Height="33px" Visible="true" OnClick="btnIdmsReceipt_Click" />
                     </div>
                 </div>
             </div>

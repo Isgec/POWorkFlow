@@ -50,7 +50,8 @@ namespace PreOrderWorkflow
                         hHeader.InnerHtml = "View Enquiry";
                         trNotes.Visible = false;
                         txtNotes.Text = "";
-                        btnIdmsReceipt.Visible = true;
+                        btnIdmsReceipt.Visible = false;
+                        // Changed this as now we have to display this button on Techno Negotiation completed page, Change- 18-10-18
                         //btn Generate IDMS Receipt. visible= true
                     }
                 }
