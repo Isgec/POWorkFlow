@@ -1172,6 +1172,7 @@ namespace PreOrderWorkflow
             DataTable dt = objWorkFlow.GetWFById();
             objWorkFlow.Parent_WFID = Convert.ToInt32(dt.Rows[0]["Parent_WFID"]);
             objWorkFlow.Project = dt.Rows[0]["Project"].ToString();
+            Session["ProjCode"] = objWorkFlow.Project.Substring(0, 6);
             objWorkFlow.Element = dt.Rows[0]["Element"].ToString();
             objWorkFlow.SpecificationNo = dt.Rows[0]["SpecificationNo"].ToString();
             objWorkFlow.Buyer = dt.Rows[0]["Buyer"].ToString();
@@ -1290,8 +1291,33 @@ namespace PreOrderWorkflow
                 // {
                 //     mM.To.Add(new MailAddress(Mailid));
                 //  }
-                mM.To.Add(MailTo); //MailTo
-                mM.To.Add(UserMailId);
+                //mM.To.Add(MailTo); //MailTo
+                //mM.To.Add(UserMailId);
+                // Change - 18-11-2018 sagar - To add email in To list from table tdisg231200 based on Project
+                string eMailTo = "";
+                string sExtraEmail = "";
+
+                if (Session["ProjCode"].ToString() != "")
+                {
+                    objWorkFlow.Project = Session["ProjCode"].ToString();
+                    DataTable dtExtraEmail = objWorkFlow.GetExtraMAilID();
+                    if (dtExtraEmail.Rows.Count > 0)
+                    {
+                        foreach (DataRow datarow1 in dtExtraEmail.Rows)
+                        {
+                            sExtraEmail += datarow1["t_mail"] + ",";
+                        }
+                    }
+                    MailTo = sExtraEmail + MailTo + "," + UserMailId;
+                }
+                else
+                {
+                    eMailTo = MailTo + "," + UserMailId;
+                }
+                foreach (var address in MailTo.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    mM.To.Add(address);
+                }
                 mM.Subject = EmailSub;
                     //Request.QueryString["Status"] + "-" + txtSpecification.Text;
                 //foreach (HttpPostedFile PostedFile in fileAttachment.PostedFiles)

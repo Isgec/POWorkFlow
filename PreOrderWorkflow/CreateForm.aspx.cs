@@ -902,9 +902,18 @@ namespace PreOrderWorkflow
                     //   Mail Send
                     DataTable dtBuyer = objWorkFlow.GetMAilID(ddlBuyer.SelectedValue);
                     DataTable dtManager = objWorkFlow.GetMAilID(ddlManager.SelectedValue);
+                    DataTable dtExtraEmail = objWorkFlow.GetExtraMAilID();
+                    string sExtraEmail = "";
+                    if (dtExtraEmail.Rows.Count > 0)
+                    {
+                        foreach (DataRow datarow1 in dtExtraEmail.Rows)
+                        {
+                            sExtraEmail += datarow1["t_mail"] + ",";
+                        }
+                    }
                     string BuyerMail = dtBuyer.Rows[0]["EMailid"].ToString();
                     string ManagerMail = dtManager.Rows[0]["EMailid"].ToString();
-                    string MailTo = BuyerMail + "," + ManagerMail;
+                    string MailTo = sExtraEmail + BuyerMail + "," + ManagerMail;
                     SendMail(MailTo);
 
                     Response.Redirect("ReleaseTechnicalSpecification.aspx?u=" + Request.QueryString["u"]);
@@ -1046,18 +1055,22 @@ namespace PreOrderWorkflow
                 // {
                 //     mM.To.Add(new MailAddress(Mailid));
                 //  }
-                if (MailTo.Contains(","))
+                foreach (var address in MailTo.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    string[] Recipient = MailTo.Split(',');
-                    mM.To.Add(Recipient[0]);
-                    mM.To.Add(Recipient[1]);
-                }//MailTo
-                else
-                {
-                    mM.To.Add(MailTo);
+                    mM.To.Add(address);
                 }
+                //if (MailTo.Contains(","))
+                //{
+                //    string[] Recipient = MailTo.Split(',');
+                //    mM.To.Add(Recipient[0]);
+                //    mM.To.Add(Recipient[1]);
+                //}//MailTo
+                //else
+                //{
+                //    mM.To.Add(MailTo);
+                //}
                 mM.To.Add(UserMailId); //MailTo
-                mM.Subject = "Technical Specification Released" + "-" + txtSpecification.Text ;
+                mM.Subject = "Technical Specification Released" + "-" + txtSpecification.Text;
                 //  foreach (HttpPostedFile PostedFile in fileUpload.PostedFiles)
                 // {
                 //     string fileName = Path.GetFileName(PostedFile.FileName);

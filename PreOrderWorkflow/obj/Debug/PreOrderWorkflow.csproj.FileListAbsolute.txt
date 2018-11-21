@@ -203,3 +203,37 @@ C:\Users\3194\Desktop\Version Backup\PreOrderWorkflow_ControlTower_commenting220
 C:\Users\3194\Desktop\Version Backup\PreOrderWorkflow_ControlTower_commenting220update\PreOrderWorkflow\obj\Debug\PreOrderWorkflow.csprojResolveAssemblyReference.cache
 C:\Users\3194\Desktop\Version Backup\PreOrderWorkflow_ControlTower_commenting220update\PreOrderWorkflow\obj\Debug\PreOrderWorkflow.dll
 C:\Users\3194\Desktop\Version Backup\PreOrderWorkflow_ControlTower_commenting220update\PreOrderWorkflow\obj\Debug\PreOrderWorkflow.pdb
+E:\Preorder-Workflow\PreOrderWorkflow\bin\ApplicationInsights.config
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\csc.exe
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\Microsoft.CodeAnalysis.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\Microsoft.CSharp.Core.targets
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\Microsoft.VisualBasic.Core.targets
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\System.Collections.Immutable.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\System.Reflection.Metadata.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\vbc.exe
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\VBCSCompiler.exe
+E:\Preorder-Workflow\PreOrderWorkflow\bin\roslyn\VBCSCompiler.exe.config
+E:\Preorder-Workflow\PreOrderWorkflow\bin\PreOrderWorkflow.dll.config
+E:\Preorder-Workflow\PreOrderWorkflow\bin\PreOrderWorkflow.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\PreOrderWorkflow.pdb
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.Agent.Intercept.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.DependencyCollector.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.PerfCounterCollector.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.ServerTelemetryChannel.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.Web.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.WindowsServer.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.ApplicationBlocks.Data.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.ApplicationInsights.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.DependencyCollector.xml
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.ServerTelemetryChannel.xml
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.Web.xml
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.AI.WindowsServer.xml
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.ApplicationInsights.xml
+E:\Preorder-Workflow\PreOrderWorkflow\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+E:\Preorder-Workflow\PreOrderWorkflow\obj\Debug\PreOrderWorkflow.csprojResolveAssemblyReference.cache
+E:\Preorder-Workflow\PreOrderWorkflow\obj\Debug\PreOrderWorkflow.dll
+E:\Preorder-Workflow\PreOrderWorkflow\obj\Debug\PreOrderWorkflow.pdb

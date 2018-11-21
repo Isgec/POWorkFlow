@@ -1476,7 +1476,11 @@ namespace PreOrderWorkflow
                 return Convert.ToInt32(outputParam);
             else return 0;
         }
-
+        public DataTable GetExtraMAilID()
+        {
+            string sGetPercentagebyCount_Weight = @"select distinct t_mail from tdmisg231200 where t_cprj ='" + Project.Substring(0, 6) + @"' ";
+            return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sGetPercentagebyCount_Weight).Tables[0];
+        }
 
         #endregion
 
