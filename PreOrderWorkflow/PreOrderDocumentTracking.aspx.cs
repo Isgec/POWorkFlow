@@ -48,7 +48,7 @@ namespace PreOrderWorkflow
                 if (dr["ReceiptNo"].ToString() != null && dr["ReceiptNo"].ToString() != "")
                 {
                     string sReceiptNumber = dr["ReceiptNo"].ToString();
-                   string ReceiptStatus = objWorkFlow.GetReceiptStatus(sReceiptNumber);
+                    string ReceiptStatus = objWorkFlow.GetReceiptStatus(sReceiptNumber);
                     dr["ReceiptStatus"] = ReceiptStatus;
                 }
             }

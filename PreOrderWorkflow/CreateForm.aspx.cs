@@ -913,7 +913,7 @@ namespace PreOrderWorkflow
                     }
                     string BuyerMail = dtBuyer.Rows[0]["EMailid"].ToString();
                     string ManagerMail = dtManager.Rows[0]["EMailid"].ToString();
-                    string MailTo = sExtraEmail + BuyerMail + "," + ManagerMail;
+                    string MailTo = sExtraEmail+ BuyerMail + "," + ManagerMail;
                     SendMail(MailTo);
 
                     Response.Redirect("ReleaseTechnicalSpecification.aspx?u=" + Request.QueryString["u"]);
@@ -1070,7 +1070,7 @@ namespace PreOrderWorkflow
                 //    mM.To.Add(MailTo);
                 //}
                 mM.To.Add(UserMailId); //MailTo
-                mM.Subject = "Technical Specification Released" + "-" + txtSpecification.Text;
+                mM.Subject = "Technical Specification Released" + "-" + txtSpecification.Text ;
                 //  foreach (HttpPostedFile PostedFile in fileUpload.PostedFiles)
                 // {
                 //     string fileName = Path.GetFileName(PostedFile.FileName);

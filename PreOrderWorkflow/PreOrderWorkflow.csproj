@@ -114,6 +114,7 @@
     </Content>
     <Content Include="mstInner.Master" />
     <Content Include="css\bootstrap3.3.7.css" />
+    <Content Include="ClassDiagram1.cd" />
     <None Include="Properties\PublishProfiles\PreOrder_WorkFlow.pubxml" />
     <Content Include="scripts\bootstrapjs3.3.1.js" />
     <None Include="Web.Debug.config">

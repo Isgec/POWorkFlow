@@ -110,13 +110,13 @@
 
                     <asp:TemplateField HeaderText="Edit" ItemStyle-HorizontalAlign="Center">
                         <ItemTemplate>
-                            <asp:LinkButton CssClass="" runat="server" Visible='<%#Eval("WF_Status").ToString()=="Technical Specification Released Returned" || Eval("WF_Status").ToString() == "Created"  %>' ID="btnEdit" OnClick="btnEdit_Click" CommandArgument='<%#Eval("WFID")+"&"+ Eval("WF_Status")%>' Text='<i class="fa fa-pencil-square-o" aria-hidden="true" style="font-size:16px"></i>' />
+                            <asp:LinkButton CssClass="" runat="server" Visible='<%#Eval("WF_Status").ToString()=="Technical Specification Released Returned" || Eval("WF_Status").ToString() == "Created" || Eval("WF_Status").ToString()=="Technical Specification Released" %>' ID="btnEdit" OnClick="btnEdit_Click" CommandArgument='<%#Eval("WFID")+"&"+ Eval("WF_Status") %>' Text='<i class="fa fa-pencil-square-o" aria-hidden="true" style="font-size:16px"></i>' />
                         </ItemTemplate>
                     </asp:TemplateField>
 
                     <asp:TemplateField HeaderText="Delete" ItemStyle-HorizontalAlign="Center">
                         <ItemTemplate>
-                            <asp:LinkButton CssClass="btn-link" runat="server" Visible='<%#Eval("WF_Status").ToString()=="Technical Specification Released Returned" || Eval("WF_Status").ToString() == "Created" %>' ID="btnDelete" OnClick="btnDelete_Click" OnClientClick="return myFunction()" CommandArgument='<%#Eval("WFID") %>' Text='<i class="fa fa-trash" aria-hidden="true" style="font-size:16px"></i>' />
+                            <asp:LinkButton CssClass="btn-link" runat="server" Visible='<%#Eval("WF_Status").ToString()=="Technical Specification Released Returned" || Eval("WF_Status").ToString() == "Created" || Eval("WF_Status").ToString()=="Technical Specification Released" %>' ID="btnDelete" OnClick="btnDelete_Click" OnClientClick="return myFunction()" CommandArgument='<%#Eval("WFID") %>' Text='<i class="fa fa-trash" aria-hidden="true" style="font-size:16px"></i>' />
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>

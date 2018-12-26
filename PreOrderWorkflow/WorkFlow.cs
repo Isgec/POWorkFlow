@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.UI;
 
 namespace PreOrderWorkflow
 {
@@ -893,7 +894,9 @@ namespace PreOrderWorkflow
         }
         public string GetReceiptStatus(string sReceiptNo)
         {
-            string sReceiptStatus = @"Select case 
+            try
+            {
+                string sReceiptStatus = @"Select case 
                                         when t_stat='1' then 'Submitted'
                                         when t_stat='2' then'Document linking'
                                         when t_stat='3' then 'Under Evaluation'
@@ -904,7 +907,19 @@ namespace PreOrderWorkflow
                                         when t_stat='8' then'Closed'
                                         end as [Doc_Status]
                                         from tdmisg134200 where t_rcno ='" + sReceiptNo + "'";
-            return SqlHelper.ExecuteScalar(Con129, CommandType.Text, sReceiptStatus).ToString();
+                var outputParam = SqlHelper.ExecuteScalar(Con129, CommandType.Text, sReceiptStatus).ToString();
+
+                if (!(outputParam == null))
+                    return (outputParam).ToString();
+                else return "";
+            }
+            catch (Exception ex)
+            {
+                // ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert("+ex.Message+");", true);
+                string x = sReceiptNo;
+                return "";
+            }
+                
         }
         //public DataTable GetReceiptDetails(string sReceiptNo)   IDMSReceiptDetails_DocumentTracking
         //{
@@ -1476,12 +1491,12 @@ namespace PreOrderWorkflow
                 return Convert.ToInt32(outputParam);
             else return 0;
         }
+
         public DataTable GetExtraMAilID()
         {
-            string sGetPercentagebyCount_Weight = @"select distinct t_mail from tdmisg231200 where t_cprj ='" + Project.Substring(0, 6) + @"' ";
+            string sGetPercentagebyCount_Weight = @"select distinct t_mail from tdmisg231200 where t_cprj ='" + Project.Substring(0,6) + @"' ";
             return SqlHelper.ExecuteDataset(Con129, CommandType.Text, sGetPercentagebyCount_Weight).Tables[0];
         }
-
         #endregion
 
     }

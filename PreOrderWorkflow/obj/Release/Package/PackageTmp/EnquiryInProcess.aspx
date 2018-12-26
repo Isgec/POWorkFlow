@@ -91,6 +91,11 @@
                             <asp:LinkButton Font-Size="11" runat="server" ID="btnReturn" OnClick="btnReturn_Click" CommandArgument='<%#Eval("WFID") %>' Visible='<%#GetVisible(Eval("WF_Status").ToString())%>'  Text='<i class="fa fa-backward" aria-hidden="true" style="font-size:16px"></i>' />
                         </ItemTemplate>
                     </asp:TemplateField>
+                    <asp:TemplateField HeaderText="All Offer Received" ItemStyle-HorizontalAlign="Center">
+                        <ItemTemplate>
+                            <asp:LinkButton Font-Size="11" runat="server" ID="btnAllOfferReceieved" OnClientClick="return confirm('Are you sure ?');" OnClick="btnAllOfferReceieved_Click" CommandArgument='<%#Eval("WFID") %>'  Visible='<%#GetAllOfferReceiveVisible(Eval("WF_Status").ToString())%>' Text='<i class="fa fa-check-square-o" aria-hidden="true" style="font-size:16px"></i>' />
+                        </ItemTemplate>
+                    </asp:TemplateField>
                        <asp:TemplateField HeaderText="Commercial offer Finalized" ItemStyle-HorizontalAlign="Center">
                         <ItemTemplate>
                             <asp:LinkButton Font-Size="11" runat="server" ID="btnClosed" OnClick="btnClosed_Click" CommandArgument='<%#Eval("WFID") %>'  ForeColor="Red" Text='<i class="fa fa-unlock-alt" aria-hidden="true" style="font-size:16px"></i>' />

@@ -565,7 +565,7 @@ namespace PreOrderWorkflow
                        // string InsertPMDLrecord = @" insert into tdmisg167200 values(" + Request.QueryString["WFPID"] + ",)";
                         lblNotify.Visible = true;
                         lblNotify.ForeColor = System.Drawing.Color.Green;
-                        lblNotify.Text = " Receipt:- '" + RECNumber + "' has been generated for WFID '" + Request.QueryString["WFPID"] + "'";
+                        lblNotify.Text = " Receipt:- '" + RECNumber + "' has been generated for WFID '" + Request.QueryString["WFID"] + "'";
                         // write the actual value for mFileName, ReceiptNo, RevisionNo below
                         string sFilename = "IDMS_Receipt_No. (" + RECNumber + ")_" + DateTime.Now.ToString("dd-MM-yyyy HH-mm") + ".xml";
                     //System.IO.StreamWriter oTW = new System.IO.StreamWriter(@"E:\Temp\" + sFilename); //for local debugging
