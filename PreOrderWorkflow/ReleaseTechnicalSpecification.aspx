@@ -71,6 +71,11 @@
                             <%#Eval("PMDLDocNo") %>
                         </ItemTemplate>
                     </asp:TemplateField>
+<%--                    <asp:TemplateField HeaderText="Indent/Line No">
+                        <ItemTemplate>
+                            <%#Eval("IndentNo") %> / <%#Eval("IndentLine") %>
+                        </ItemTemplate>
+                    </asp:TemplateField>--%>
 
                     <asp:TemplateField HeaderText="BuyerName">
                         <ItemTemplate>

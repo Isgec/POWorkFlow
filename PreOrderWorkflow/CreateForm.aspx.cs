@@ -818,7 +818,7 @@ namespace PreOrderWorkflow
                                     {
                                         objWorkFlow.MultiPMDLdocDesc = ddlPMDL.Items[i].Value.ToString();
                                         objWorkFlow.InsertMultiPMDL();
-                                        // objWorkFlow.InsertMultiPMDLtoDuplicateTable();
+                                         objWorkFlow.InsertMultiPMDLtoDuplicateTable();
                                     }
                                 }
                             }

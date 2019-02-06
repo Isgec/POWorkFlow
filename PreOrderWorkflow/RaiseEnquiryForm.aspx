@@ -163,7 +163,7 @@
                 <div class="form-group">
                     <label class="col-sm-3">Message</label>
                     <div class="col-sm-8">
-                        <asp:TextBox runat="server" CssClass="form-control" TextMode="MultiLine" ID="txtNotes" Height="90"></asp:TextBox>
+                        <asp:TextBox runat="server" CssClass="form-control" TextMode="MultiLine" MaxLength="200" ID="txtNotes" Height="90"></asp:TextBox>
                     </div>
                 </div>
             </div>

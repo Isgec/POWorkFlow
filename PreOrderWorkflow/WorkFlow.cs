@@ -13,7 +13,8 @@ namespace PreOrderWorkflow
     public class WorkFlow
     {
         public static string Con = ConfigurationManager.AppSettings["Connection"];
-        //public static string ConTest = ConfigurationManager.AppSettings["ConnectionTest"]; ConnectionLive
+        public static string ConTest = ConfigurationManager.AppSettings["ConnectionTest"];
+        //ConnectionLive
         public static string Con129 = ConfigurationManager.AppSettings["ConnectionLive"];
 
         #region Properties
@@ -282,6 +283,7 @@ namespace PreOrderWorkflow
                                       ,[DateTime]
                                       ,[Supplier]
                                       ,[SupplierName]
+                                      ,[IndentNo], [IndentLine] 
                                       ,EmployeeName
                                        from [WF1_PreOrder] WF
                                 INNER JOIN HRM_Employees E on E.CardNo=WF.UserId
