@@ -65,8 +65,12 @@ namespace PreOrderWorkflow
         public string BuyerTo { get; set; }
         public string PMDLFrom { get; set; }
         public string PMDLTo { get; set; }
-
         public string ItemReference { get; set; }
+
+        public string SearchWFID { get; set; }
+        public string SearchWFProject { get; set; }
+        public string SearchWFStatus { get; set; }
+        public string SearchWFDate { get; set; }
 
         #endregion
 
@@ -131,7 +135,53 @@ namespace PreOrderWorkflow
             //                    INNER JOIN HRM_Employees E on E.CardNo=WF.UserId
             //                    WHERE Wf_Status in(" + WF_Status + ")  and WF.Buyer='" + UserId + "' order by WFID desc").Tables[0]; //
         }
+        public DataTable GetWFBY_HeaderFilter()
+        {
+            //string WFbyStatus = @"select [WFID],[Parent_WFID],[Project] ,[Element],[SpecificationNo]
+            //  ,[PMDLDocNo],(Select EmployeeName FROM HRM_Employees where CardNo=Buyer) as BuyerName
+            //  ,[Buyer],(Select EmployeeName FROM HRM_Employees where CardNo=Manager) as ManagerName
+            //  ,[Manager],[WF_Status] ,[UserId],[DateTime],[Supplier],[SupplierName] ,EmployeeName
+            //    from [WF1_PreOrder] WF INNER JOIN HRM_Employees E on E.CardNo=WF.UserId
+            //    WHERE Wf_Status in('" + WF_Status + "')  and WF.Buyer='" + UserId + "' order by WFID desc";
 
+            string Qryemp = "  select [WFID],[Parent_WFID],[Project] ,[Element],[SpecificationNo] ";
+            Qryemp += " ,[PMDLDocNo],(Select EmployeeName FROM HRM_Employees where CardNo=Buyer) as BuyerName ";
+            Qryemp += " ,[Buyer],(Select EmployeeName FROM HRM_Employees where CardNo=Manager) as ManagerName ";
+            Qryemp += " ,[Manager],[WF_Status] ,[UserId],[DateTime],[Supplier],[SupplierName] ,EmployeeName ";
+            Qryemp += " from [WF1_PreOrder] WF INNER JOIN HRM_Employees E on E.CardNo=WF.UserId where ";
+            if (SearchWFID != "")
+            {
+                Qryemp += " Convert(varchar(10), WFID) like '%" + SearchWFID + "%' and";
+            }
+            if (SearchWFProject != "")
+            {
+                Qryemp += " Project like '%" + SearchWFProject + "%' and";
+            }
+            if (SearchWFDate != "")
+            {
+                Qryemp += " Convert(varchar(10), DateTime,103) like '%" + SearchWFDate + "%' and";
+            }
+            Qryemp += " Wf_Status in('" + WF_Status + "')  and WF.Buyer='" + UserId + "' order by WFID desc";
+            return SqlHelper.ExecuteDataset(Con, CommandType.Text, Qryemp).Tables[0];
+
+            //return SqlHelper.ExecuteDataset(Con, CommandType.Text, @"select [WFID]
+            //                          ,[Parent_WFID]
+            //                          ,[Project]
+            //                          ,[Element]
+            //                          ,[SpecificationNo]
+            //                          ,[PMDLDocNo]
+            //                          ,(Select EmployeeName FROM HRM_Employees where CardNo=Buyer) as BuyerName
+            //                          ,[Buyer]
+            //                          ,[WF_Status]
+            //                          ,[UserId]
+            //                          ,[DateTime]
+            //                          ,[Supplier]
+            //                          ,[SupplierName]
+            //                          ,EmployeeName
+            //                           from [WF1_PreOrder] WF
+            //                    INNER JOIN HRM_Employees E on E.CardNo=WF.UserId
+            //                    WHERE Wf_Status in(" + WF_Status + ")  and WF.Buyer='" + UserId + "' order by WFID desc").Tables[0]; //
+        }
         public DataTable PopulateDropdownList()
         {
             return SqlHelper.ExecuteDataset(Con, CommandType.Text, @"select distinct Project from WF1_PreOrder").Tables[0];

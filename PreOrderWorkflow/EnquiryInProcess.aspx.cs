@@ -19,8 +19,8 @@ namespace PreOrderWorkflow
                 if (Request.QueryString["u"] != null)
                 {
                     GetData();
-                   // (LinkButton)btnAllOfferReceieved.Attributes.Add("onclick", "getMessage()");
-               
+                    // (LinkButton)btnAllOfferReceieved.Attributes.Add("onclick", "getMessage()");
+
                 }
                 else
                 {
@@ -52,8 +52,6 @@ namespace PreOrderWorkflow
             }
         }
         private void GetData()
-
-
         {
             objWorkFlow = new WorkFlow();
             objWorkFlow.WF_Status = "Enquiry in progress', 'Technical Specification Released','All Offer Received";
@@ -131,7 +129,7 @@ namespace PreOrderWorkflow
             {
                 ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert('Some technical issue');", true);
             }
-        } 
+        }
         #endregion
         private void InsertPreHistory(int Id, string status)
         {
@@ -142,7 +140,7 @@ namespace PreOrderWorkflow
             objWorkFlow.Project = dt.Rows[0]["Project"].ToString();
             objWorkFlow.Element = dt.Rows[0]["Element"].ToString();
             objWorkFlow.SpecificationNo = dt.Rows[0]["SpecificationNo"].ToString();
-            objWorkFlow.PMDLdocDesc= dt.Rows[0]["PMDLDocNo"].ToString();
+            objWorkFlow.PMDLdocDesc = dt.Rows[0]["PMDLDocNo"].ToString();
             objWorkFlow.Buyer = dt.Rows[0]["Buyer"].ToString();
             objWorkFlow.UserId = Request.QueryString["u"];
             objWorkFlow.Manager = dt.Rows[0]["Manager"].ToString();
@@ -240,7 +238,7 @@ namespace PreOrderWorkflow
                 int nRecordInserted = objWorkFlow.InsertPreOrderDatatoControlTower();
                 if (nRecordInserted > 0)
                 {
-                    objWorkFlow.WFID = Convert.ToInt32(btn.CommandArgument); 
+                    objWorkFlow.WFID = Convert.ToInt32(btn.CommandArgument);
                     DataTable dt2 = objWorkFlow.GetWFById();
                     //objWorkFlow.Parent_WFID = Convert.ToInt32(dt2.Rows[0]["Parent_WFID"]);
                     DataTable dtPMDL1 = objWorkFlow.GetMultiPMDL(objWorkFlow.WFID.ToString());
@@ -306,7 +304,7 @@ namespace PreOrderWorkflow
                             }
                             double nTechnoComNegotiationrawingCount = objWorkFlow.GetTechnoComNegotiationrawingCount(PMDLDocNo);
                             // double nTotalDrawingCount = objWorkFlow.GeTotalDrawingCount();
-                            double nTotalDrawingCount=objWorkFlow.TechnoComNegotiation_ChildRecordCount(PMDLDocNo);
+                            double nTotalDrawingCount = objWorkFlow.TechnoComNegotiation_ChildRecordCount(PMDLDocNo);
                             double nTechnoComNegotiationDrawing_Weight = objWorkFlow.GetTechnoComNegotiationWeight(PMDLDocNo);
                             double nTotalTechnoComNegotiation_Weight = objWorkFlow.GetTotalWeight();
 
@@ -339,7 +337,7 @@ namespace PreOrderWorkflow
                             double percentage_byWeight_ComFinalized = 0;
                             double percentage_byCount_OfferReceieved = 0;
                             double percentage_byWeight_OfferReceieved = 0;
-                           string Itemref_Typ = objWorkFlow.GetItemRefType();
+                            string Itemref_Typ = objWorkFlow.GetItemRefType();
 
                             if (dtPercentage1.Rows.Count > 0)
                             {
@@ -347,7 +345,7 @@ namespace PreOrderWorkflow
                                 {
                                     objWorkFlow.Project = dr1["Project"].ToString();
                                     objWorkFlow.ItemReference = dr1["ItemReference"].ToString();
-                                    
+
                                     //double percentage_byCount = Convert.ToDouble(dr1["CountPercentage"]);
                                     //double percentage_byWeight = Convert.ToDouble(dr1["WeightPercentage"]);
                                     percentage_byCount_ComFinalized += Convert.ToDouble(dr1["CountPercentage"]);
@@ -378,7 +376,7 @@ namespace PreOrderWorkflow
                                 {
 
                                     objWorkFlow.BusinessObjectHandle = "CT_RFQOFFERECEIVED";
-                                   // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_OfferReceieved);
+                                    // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_OfferReceieved);
                                 }
                                 else
                                 {
@@ -392,7 +390,7 @@ namespace PreOrderWorkflow
                                     {
 
                                         objWorkFlow.BusinessObjectHandle = "CT_RFQOFFERECEIVED";
-                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_OfferReceieved);
+                                        // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_OfferReceieved);
                                     }
                                 }
                             }
@@ -402,56 +400,56 @@ namespace PreOrderWorkflow
                                 if (percentage_byCount_OfferReceieved >= 100)
                                 {
                                     objWorkFlow.BusinessObjectHandle = "CT_RFQOFFERECEIVED";
-                                   // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
+                                    // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
                                 }
                                 else
                                 {
                                     objWorkFlow.BusinessObjectHandle = "CT_RFQOFFERECEIVED";
-                                   // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_OfferReceieved);
+                                    // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_OfferReceieved);
                                 }
                             }
                             if (percentage_byCount_ComFinalized < 100.00 && percentage_byWeight_ComFinalized < 100.00)
-                                    {
-                                        if ((percentage_byCount_ComFinalized >= percentage_byWeight_ComFinalized))
-                                        {
-                                            objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
-                                            //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_ComFinalized);
-                                            
-                                        }
-                                        else
-                                        {
-                                            if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
-                                            {
-                                                objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
-                                               // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight_ComFinalized);
-                                                
-                                            }
-                                            else
-                                            {
-                                                objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
-                                                //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_ComFinalized);
-                                               
-                                            }
-                                        }
-                                    }
+                            {
+                                if ((percentage_byCount_ComFinalized >= percentage_byWeight_ComFinalized))
+                                {
+                                    objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
+                                    //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_ComFinalized);
 
+                                }
+                                else
+                                {
+                                    if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
+                                    {
+                                        objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
+                                        // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight_ComFinalized);
+
+                                    }
                                     else
                                     {
-                                        if (percentage_byCount_ComFinalized >= 100)
-                                        {
-                                            objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
-                                           // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
-                                            
-                                        }
-                                        else
-                                        {
-                                            objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
-                                            //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_ComFinalized);
-                                           
-                                        }
-                                    }
+                                        objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
+                                        //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_ComFinalized);
 
-                           
+                                    }
+                                }
+                            }
+
+                            else
+                            {
+                                if (percentage_byCount_ComFinalized >= 100)
+                                {
+                                    objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
+                                    // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
+
+                                }
+                                else
+                                {
+                                    objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
+                                    //objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount_ComFinalized);
+
+                                }
+                            }
+
+
 
 
 
@@ -522,7 +520,7 @@ namespace PreOrderWorkflow
             if (res > 0)
             {
                 InsertPreHistory(Convert.ToInt32(btn.CommandArgument), "All Offer Received");
-               // GetData();
+                // GetData();
                 //ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert('Status Changed to All Offer Received');", true);
             }
 
@@ -536,7 +534,7 @@ namespace PreOrderWorkflow
             {
                 foreach (DataRow dr12 in dt12.Rows)
                 {
-                    objWorkFlow.Project = dr12["Project"].ToString().Substring(0,6);
+                    objWorkFlow.Project = dr12["Project"].ToString().Substring(0, 6);
                 }
             }
             string WFID = objWorkFlow.WFID.ToString();
@@ -604,7 +602,7 @@ namespace PreOrderWorkflow
                         }
                         objWorkFlow.WF_Status = "All Offer Received";
                         objWorkFlow.BusinessObjectHandle = "CT_RFQOFFERECEIVED";
-                        objWorkFlow.Parent_WFID= objWorkFlow.WFID;
+                        objWorkFlow.Parent_WFID = objWorkFlow.WFID;
                         double percentage_byCount = 0;
                         double percentage_byWeight = 0;
 
@@ -620,99 +618,99 @@ namespace PreOrderWorkflow
                                 objWorkFlow.ItemReference = dr1["ItemReference"].ToString();
                                 //double percentage_byCount = Convert.ToDouble(dr1["CountPercentage"]);
                                 //double percentage_byWeight = Convert.ToDouble(dr1["WeightPercentage"]);
-                                 percentage_byCount += Convert.ToDouble(dr1["CountPercentage"]);
-                                 percentage_byWeight += Convert.ToDouble(dr1["WeightPercentage"]);
+                                percentage_byCount += Convert.ToDouble(dr1["CountPercentage"]);
+                                percentage_byWeight += Convert.ToDouble(dr1["WeightPercentage"]);
                             }
                         }
 
-                                if (percentage_byCount < 100.00 && percentage_byWeight < 100.00)
+                        if (percentage_byCount < 100.00 && percentage_byWeight < 100.00)
+                        {
+                            if ((percentage_byCount >= percentage_byWeight))
+                            {
+                                // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                            }
+                            else
+                            {
+                                if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
                                 {
-                                    if ((percentage_byCount >= percentage_byWeight))
-                                    {
-                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
-                                    }
-                                    else
-                                    {
-                                        if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
-                                        {
-                                           // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight);
-                                        }
-                                        else
-                                        {
-                                           // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
-                                        }
-                                    }
+                                    // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight);
                                 }
-
                                 else
                                 {
-                                    if (percentage_byCount >= 100)
-                                    {
-                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
-                                    }
-                                    else
-                                    {
-                                       // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
-                                    }
+                                    // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
                                 }
-                                #endregion
+                            }
+                        }
 
-                                #region Progress Update for Tecno Comm. Negotiation on All Offer Received Button Click
+                        else
+                        {
+                            if (percentage_byCount >= 100)
+                            {
+                                // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
+                            }
+                            else
+                            {
+                                // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount);
+                            }
+                        }
+                        #endregion
 
-                                DataTable dtPMDLDoc = objWorkFlow.GetPMDLFromItemRef();
-                                if (dtPMDLDoc.Rows.Count > 0)
+                        #region Progress Update for Tecno Comm. Negotiation on All Offer Received Button Click
+
+                        DataTable dtPMDLDoc = objWorkFlow.GetPMDLFromItemRef();
+                        if (dtPMDLDoc.Rows.Count > 0)
+                        {
+
+                            for (int i = 0; i < dtPMDLDoc.Rows.Count; i++)
+                            {
+
+                                if (i == 0)
                                 {
-
-                                    for (int i = 0; i < dtPMDLDoc.Rows.Count; i++)
-                                    {
-
-                                        if (i == 0)
-                                        {
-                                            PMDLDocs = "'" + dtPMDLDoc.Rows[0]["t_docn"].ToString() + "'";
-                                        }
-                                        else
-                                        {
-                                            PMDLDocs += ",'" + dtPMDLDoc.Rows[i]["t_docn"].ToString() + "'";
-                                        }
-
-                                    }
+                                    PMDLDocs = "'" + dtPMDLDoc.Rows[0]["t_docn"].ToString() + "'";
+                                }
+                                else
+                                {
+                                    PMDLDocs += ",'" + dtPMDLDoc.Rows[i]["t_docn"].ToString() + "'";
                                 }
 
+                            }
+                        }
 
-                                double nTechnoComNegotiationDrawing_Count = 0;
-                                double nTechnoComNegotiationDrawing_Weight = 0;
 
-                                double nTotalTechnoComNegotiation_Count = 0;
-                                double nTotalTechnoComNegotiation_Weight = 0;
+                        double nTechnoComNegotiationDrawing_Count = 0;
+                        double nTechnoComNegotiationDrawing_Weight = 0;
 
-                                double percentageTechnoComNegotiation_byCount = 0;
-                                double percentageTechnoComNegotiatio_byWeight = 0;
+                        double nTotalTechnoComNegotiation_Count = 0;
+                        double nTotalTechnoComNegotiation_Weight = 0;
 
-                               // nTotalTechnoComNegotiation_Count = objWorkFlow.GetTotalChildRecordCount(PMDLDocNo);
-                                nTotalTechnoComNegotiation_Count = objWorkFlow.AllOfferReceieved_ChildRecordCount(PMDLDocNo);
-                                //3
-                                nTechnoComNegotiationDrawing_Count = objWorkFlow.GetTechnoCommercialChildRecordCount(PMDLDocNo);
-                               //objWorkFlow.GetCuurentRFQ_OfferReceivedDrawingWeight
-                               nTechnoComNegotiationDrawing_Weight = objWorkFlow.GetCuurentRFQComNegotiation_OfferReceivedDrawingWeight(PMDLDocNo);
-                                nTotalTechnoComNegotiation_Weight = objWorkFlow.GetTotalDrawingWeight();
+                        double percentageTechnoComNegotiation_byCount = 0;
+                        double percentageTechnoComNegotiatio_byWeight = 0;
 
-                                if (nTotalTechnoComNegotiation_Count != 0 && nTotalOfferReceived_Count != 0)
-                                {
-                                    percentageTechnoComNegotiation_byCount = Math.Round((nTechnoComNegotiationDrawing_Count / nTotalTechnoComNegotiation_Count)
-                                                                           * (nOfferReceiveDrawing_Count / nTotalOfferReceived_Count) * 100, 4);
-                                }
-                                if (nToatlOfferReceived_Weight != 0 && nTotalTechnoComNegotiation_Weight != 0)
-                                {
+                        // nTotalTechnoComNegotiation_Count = objWorkFlow.GetTotalChildRecordCount(PMDLDocNo);
+                        nTotalTechnoComNegotiation_Count = objWorkFlow.AllOfferReceieved_ChildRecordCount(PMDLDocNo);
+                        //3
+                        nTechnoComNegotiationDrawing_Count = objWorkFlow.GetTechnoCommercialChildRecordCount(PMDLDocNo);
+                        //objWorkFlow.GetCuurentRFQ_OfferReceivedDrawingWeight
+                        nTechnoComNegotiationDrawing_Weight = objWorkFlow.GetCuurentRFQComNegotiation_OfferReceivedDrawingWeight(PMDLDocNo);
+                        nTotalTechnoComNegotiation_Weight = objWorkFlow.GetTotalDrawingWeight();
+
+                        if (nTotalTechnoComNegotiation_Count != 0 && nTotalOfferReceived_Count != 0)
+                        {
+                            percentageTechnoComNegotiation_byCount = Math.Round((nTechnoComNegotiationDrawing_Count / nTotalTechnoComNegotiation_Count)
+                                                                   * (nOfferReceiveDrawing_Count / nTotalOfferReceived_Count) * 100, 4);
+                        }
+                        if (nToatlOfferReceived_Weight != 0 && nTotalTechnoComNegotiation_Weight != 0)
+                        {
                             // percentageTechnoComNegotiatio_byWeight = Math.Round((nTechnoComNegotiationDrawing_Weight / nTotalTechnoComNegotiation_Weight) * (nOfferReceivedDrawing_Weight / nToatlOfferReceived_Weight) * 100, 4);
                             percentageTechnoComNegotiatio_byWeight = Math.Round((nTechnoComNegotiationDrawing_Weight / nTotalTechnoComNegotiation_Weight) * (nTechnoComNegotiationDrawing_Count / nTotalTechnoComNegotiation_Count) * 100, 4);
                         }
-                                  objWorkFlow.Parent_WFID = objWorkFlow.WFID;
-                                 objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
-                                objWorkFlow.WF_Status = "All Offer Received";
+                        objWorkFlow.Parent_WFID = objWorkFlow.WFID;
+                        objWorkFlow.BusinessObjectHandle = "CT_RFQCOMMERCIALFINALISED";
+                        objWorkFlow.WF_Status = "All Offer Received";
 
-                                objWorkFlow.InsertIntoItemReferencewiseProgressTable(percentageTechnoComNegotiatio_byWeight, percentageTechnoComNegotiation_byCount);
-                                //DataTable dtPercentage = objWorkFlow.GetTechnoComNegotiationPercentagebyCount_Weight();
-                                DataTable dtPercentage = objWorkFlow.GetPercentagebyCount_Weight();
+                        objWorkFlow.InsertIntoItemReferencewiseProgressTable(percentageTechnoComNegotiatio_byWeight, percentageTechnoComNegotiation_byCount);
+                        //DataTable dtPercentage = objWorkFlow.GetTechnoComNegotiationPercentagebyCount_Weight();
+                        DataTable dtPercentage = objWorkFlow.GetPercentagebyCount_Weight();
                         double percentage_byCount1 = 0;
                         double percentage_byWeight1 = 0;
 
@@ -724,47 +722,47 @@ namespace PreOrderWorkflow
                                 objWorkFlow.ItemReference = dr2["ItemReference"].ToString();
                                 //double percentage_byCount1 = Convert.ToDouble(dr2["CountPercentage"]);
                                 //double percentage_byWeight1 = Convert.ToDouble(dr2["WeightPercentage"]);
-                                 percentage_byCount1 += Convert.ToDouble(dr2["CountPercentage"]);
-                                 percentage_byWeight1 += Convert.ToDouble(dr2["WeightPercentage"]);
+                                percentage_byCount1 += Convert.ToDouble(dr2["CountPercentage"]);
+                                percentage_byWeight1 += Convert.ToDouble(dr2["WeightPercentage"]);
                             }
                         }
 
-                                        if (percentage_byCount1 < 100.00 && percentage_byWeight1 < 100.00)
-                                        {
-                                            if ((percentage_byCount1 >= percentage_byWeight1))
-                                            {
-                                              //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount1);
-                                            }
-                                            else
-                                            {
-                                                if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
-                                                {
-                                                  //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight1);
-                                                }
-                                                else
-                                                {
-                                                  //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount1);
-                                                }
-                                            }
-                                        }
+                        if (percentage_byCount1 < 100.00 && percentage_byWeight1 < 100.00)
+                        {
+                            if ((percentage_byCount1 >= percentage_byWeight1))
+                            {
+                                //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount1);
+                            }
+                            else
+                            {
+                                if (Itemref_Typ == "4")// when item reference typ=="Self Engineered"
+                                {
+                                    //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byWeight1);
+                                }
+                                else
+                                {
+                                    //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount1);
+                                }
+                            }
+                        }
 
-                                        else
-                                        {
-                                            if (percentage_byCount1 >= 100)
-                                            {
-                                               // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
-                                            }
-                                            else
-                                            {
-                                              //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount1);
-                                            }
-                                        }
-                                //    }
-                                //}
-                                #endregion
+                        else
+                        {
+                            if (percentage_byCount1 >= 100)
+                            {
+                                // objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(100);
+                            }
+                            else
+                            {
+                                //  objWorkFlow.UpdateTechOfferReceivedDrawingpercentage(percentage_byCount1);
+                            }
+                        }
+                        //    }
+                        //}
+                        #endregion
 
-                           // }
-                       // }
+                        // }
+                        // }
                     }
                 }
             }
@@ -775,7 +773,60 @@ namespace PreOrderWorkflow
             ScriptManager.RegisterStartupScript(this, typeof(Page), "alert", "alert('Status Changed to All Offer Received');", true);
 
         }
+        protected void txt_wfidonTextChange(object sender, EventArgs e)
+        {
+           // GetData();
+            objWorkFlow = new WorkFlow();
+            TextBox txt_searchwfid = (TextBox)gvData.HeaderRow.FindControl("txt_searchwfid");
+            TextBox txt_searchproj = (TextBox)gvData.HeaderRow.FindControl("txt_searchproj");
+            DropDownList ddl_srchstatus = (DropDownList)gvData.HeaderRow.FindControl("ddl_srchstatus");
+            TextBox txtDate = (TextBox)gvData.HeaderRow.FindControl("txtDate");
+            if (txt_searchwfid.Text == "")
+            {
+                objWorkFlow.SearchWFID = "";
+            }
+            else
+            {
+                objWorkFlow.SearchWFID = txt_searchwfid.Text;
+            }
+            if (txt_searchproj.Text == "")
+            {
+                objWorkFlow.SearchWFProject = "";
+            }
+            else
+            {
+                objWorkFlow.SearchWFProject = txt_searchproj.Text;
+            }
+            if (ddl_srchstatus.Text == "")
+            {
+                objWorkFlow.WF_Status = "Enquiry in progress', 'Technical Specification Released','All Offer Received";
+            }
+            else
+            {
+                objWorkFlow.WF_Status = ddl_srchstatus.Text;
+            }
+            if (txtDate.Text == "")
+            {
+                objWorkFlow.SearchWFDate = "";
+            }
+            else
+            {
+                objWorkFlow.SearchWFDate = txtDate.Text;
+            }
+            //objWorkFlow.WF_Status = "Enquiry in progress', 'Technical Specification Released','All Offer Received";
+            objWorkFlow.UserId = Request.QueryString["u"];
+            DataTable dt = objWorkFlow.GetWFBY_HeaderFilter();
 
+            gvData.DataSource = dt;
+            gvData.DataBind();
+            TextBox txt_searchwfid1 = (TextBox)gvData.HeaderRow.FindControl("txt_searchwfid");
+            txt_searchwfid1.Text = objWorkFlow.SearchWFID;
+        }
+        
 
+        protected void btn_refresh_Click(object sender, EventArgs e)
+        {
+            GetData();
+        }
     }
 }
